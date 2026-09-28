@@ -86,19 +86,30 @@ export function HomePage() {
     const sFloorParam = searchParams.get('sFloor');
     const tFloorParam = searchParams.get('tFloor') || searchParams.get('floor');
 
-    let sFloor = 6;
-    if (sFloorParam && !isNaN(parseInt(sFloorParam, 10))) {
-      sFloor = parseInt(sFloorParam, 10);
-    } else if (/^[1-6]\d{3}$/.test(startParam)) {
-      sFloor = parseInt(startParam[0], 10);
-    }
+    const resolveFloor = (code: string, fallbackFloor?: number): number => {
+      if (fallbackFloor && !isNaN(fallbackFloor)) return fallbackFloor;
+      const match = allBuildingDestinations.find(
+        (r) => r.id.toLowerCase() === code.toLowerCase()
+      );
+      if (match?.floor) return match.floor;
 
-    let tFloor = 6;
-    if (tFloorParam && !isNaN(parseInt(tFloorParam, 10))) {
-      tFloor = parseInt(tFloorParam, 10);
-    } else if (/^[1-6]\d{3}$/.test(targetParam)) {
-      tFloor = parseInt(targetParam[0], 10);
-    }
+      if (/^0\d{3}$/.test(code) || /^[4-8]\d{2}$/.test(code)) return 1; // Ground Floor Mech
+      if (/^1\d{3}$/.test(code)) return 2; // 1st Floor IT
+      if (/^2\d{3}$/.test(code) || code.startsWith('356') || /^3\d{3}$/.test(code)) return 3; // 3rd Floor AIDS/ECE
+      if (/^4\d{3}$/.test(code)) return 4; // 4th Floor Chemical
+      if (/^5\d{3}$/.test(code)) return 5; // 5th Floor Biomedical
+      if (/^6\d{3}$/.test(code)) return 6; // 6th Floor MBA
+      return 6;
+    };
+
+    const sFloor = resolveFloor(
+      startParam,
+      sFloorParam ? parseInt(sFloorParam, 10) : undefined
+    );
+    const tFloor = resolveFloor(
+      targetParam,
+      tFloorParam ? parseInt(tFloorParam, 10) : undefined
+    );
 
     // Set initial active floor to target floor
     setCurrentFloor(tFloor);

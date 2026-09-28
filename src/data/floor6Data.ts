@@ -11,15 +11,22 @@ export const ROOMS_DATA: RoomItem[] = [
   // Outer West Wing (Cols 1-2)
   { id: "6411", std: "6411", name: "Classroom 6411", type: "classroom", capacity: 45, row: 4, col: 1, bay: 1, x: 95, y: 645, w: 60, h: 60, doorX: 125, doorY: 620, desc: "West Wing lecture classroom." },
   { id: "6412", std: "6412", name: "Classroom 6412", type: "classroom", capacity: 45, row: 4, col: 1, bay: 2, x: 160, y: 645, w: 60, h: 60, doorX: 190, doorY: 620, desc: "West Wing lecture classroom." },
+  // Row 4 Col 3 Rooms (6431-6433)
+  { id: "6431", std: "6431", name: "Classroom 6431", type: "classroom", capacity: 40, row: 4, col: 3, bay: 1, x: 260, y: 645, w: 75, h: 55, doorX: 345, doorY: 620, desc: "MBA Classroom 6431." },
+  { id: "6432", std: "6432", name: "Classroom 6432", type: "classroom", capacity: 40, row: 4, col: 3, bay: 2, x: 260, y: 585, w: 75, h: 55, doorX: 345, doorY: 570, desc: "MBA Classroom 6432." },
+  { id: "6433", std: "6433", name: "Classroom 6433", type: "classroom", capacity: 40, row: 4, col: 3, bay: 3, x: 260, y: 525, w: 75, h: 55, doorX: 345, doorY: 520, desc: "MBA Classroom 6433." },
   // Central Bar (Cols 4,5,6)
   { id: "6451", std: "6451", name: "Classroom 6451", type: "classroom", capacity: 50, row: 4, col: 5, bay: 1, x: 382, y: 645, w: 56, h: 60, doorX: 410, doorY: 620, desc: "Direct access tiered lecture hall." },
   { id: "6452", std: "6452", name: "Classroom 6452", type: "classroom", capacity: 50, row: 4, col: 5, bay: 2, x: 442, y: 645, w: 56, h: 60, doorX: 470, doorY: 620, desc: "Audio-visual equipped collaborative hall." },
   { id: "6453", std: "6453", name: "Classroom 6453", type: "classroom", capacity: 50, row: 4, col: 5, bay: 3, x: 502, y: 645, w: 56, h: 60, doorX: 530, doorY: 620, desc: "Executive hall with personal power modules." },
   { id: "6454", std: "6454", name: "Classroom 6454", type: "classroom", capacity: 50, row: 4, col: 5, bay: 4, x: 562, y: 645, w: 56, h: 60, doorX: 590, doorY: 620, desc: "Central lecture room with motorized curtains." },
+  // Row 4 Col 7 (6471)
+  { id: "6471", std: "6471", name: "Classroom 6471", type: "classroom", capacity: 40, row: 4, col: 7, bay: 1, x: 665, y: 645, w: 75, h: 60, doorX: 655, doorY: 620, desc: "MBA Classroom 6471." },
   // Outer East Wing (Cols 8)
   { id: "6483", std: "6483", name: "Classroom 6483", type: "classroom", capacity: 40, row: 4, col: 8, bay: 3, x: 730, y: 645, w: 58, h: 60, doorX: 759, doorY: 620, desc: "Multi-modal display hall with lecture recording." },
   { id: "6482", std: "6482", name: "Classroom 6482", type: "classroom", capacity: 40, row: 4, col: 8, bay: 2, x: 792, y: 645, w: 58, h: 60, doorX: 821, doorY: 620, desc: "Standard presentation lecture room." },
   { id: "6481", std: "6481", name: "Classroom 6481", type: "classroom", capacity: 40, row: 4, col: 8, bay: 1, x: 855, y: 645, w: 58, h: 60, doorX: 884, doorY: 620, desc: "Whiteboard-lined discussion classroom." },
+
 
   // ---------------- ROW 5: Central Void with Left/Right Flanking Classrooms ----------------
   // Outer West: Restrooms (Men / Women)
@@ -48,6 +55,7 @@ export const ROOMS_DATA: RoomItem[] = [
   { id: "6652", std: "6652", name: "Classroom 6652", type: "classroom", capacity: 58, row: 6, col: 5, bay: 2, x: 457, y: 345, w: 70, h: 62, doorX: 492, doorY: 415, desc: "Main concourse studio." },
   { id: "6653", std: "6653", name: "Classroom 6653", type: "classroom", capacity: 58, row: 6, col: 5, bay: 3, x: 532, y: 345, w: 70, h: 62, doorX: 567, doorY: 415, desc: "Main concourse studio." },
   // Outer East (Cols 8)
+  { id: "6683", std: "6683", name: "Classroom 6683", type: "classroom", capacity: 48, row: 6, col: 8, bay: 3, x: 720, y: 345, w: 60, h: 62, doorX: 750, doorY: 415, desc: "MBA Classroom 6683." },
   { id: "6682", std: "6682", name: "Classroom 6682", type: "classroom", capacity: 48, row: 6, col: 8, bay: 2, x: 785, y: 345, w: 60, h: 62, doorX: 815, doorY: 415, desc: "East Wing lecture studio." },
   { id: "6681", std: "6681", name: "Classroom 6681", type: "classroom", capacity: 45, row: 6, col: 8, bay: 1, x: 850, y: 345, w: 60, h: 62, doorX: 880, doorY: 415, desc: "East Wing lecture studio." },
 

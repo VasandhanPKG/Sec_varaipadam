@@ -11,8 +11,8 @@ import {
   Mail,
   Lock,
   User,
-  Sparkles,
-  CheckCircle2,
+  Compass,
+  Building,
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
@@ -74,27 +74,27 @@ export const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f18] text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950">
-      {/* 1. TOP HEADER - ADMIN LOGIN ONLY AT TOP RIGHT */}
-      <header className="sticky top-0 z-40 w-full bg-[#0d1522]/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3 flex items-center justify-between shadow-lg">
+    <div className="min-h-screen bg-[#f7f5ee] spaceplanner-grid-bg text-[#11202f] flex flex-col selection:bg-[#dbe4eb] selection:text-[#1e354d]">
+      {/* 1. TOP HEADER (SPACEPLANNER THEME) */}
+      <header className="sticky top-0 z-40 w-full bg-[#fcfaf6]/95 backdrop-blur-md border-b border-[#ded4c0] px-4 sm:px-8 py-3 flex items-center justify-between shadow-xs">
         {/* Brand & Logo */}
         <div className="flex items-center space-x-3">
           <img
             src="/logo.png"
             alt="SEC Logo"
-            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-amber-500/50 shadow-md shadow-amber-500/20"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-full object-cover ring-2 ring-[#ded4c0] shadow-sm"
           />
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-serif font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-amber-400 via-amber-200 to-white bg-clip-text text-transparent">
+              <span className="font-serif font-black text-lg sm:text-xl tracking-tight text-[#11202f]">
                 SEC வரைபடம்
               </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.2 text-[8.5px] font-mono uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded font-bold">
-                VARAIPADAM
+              <span className="hidden sm:inline-block px-2 py-0.5 text-[9px] font-mono uppercase bg-[#dbe4eb] text-[#1e354d] border border-[#cad7e2] rounded-full font-bold">
+                SPACEPLANNER
               </span>
             </div>
-            <p className="text-[10px] text-slate-400">
-              Saveetha Engineering College • Auditorium Block Indoor Navigation
+            <p className="text-[11px] font-sans text-[#64748b]">
+              Saveetha Engineering College • Auditorium Block
             </p>
           </div>
         </div>
@@ -103,38 +103,47 @@ export const LandingPage: React.FC = () => {
         <div>
           <button
             onClick={() => setIsAdminModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 shadow-md shadow-amber-600/30 transition-all transform active:scale-95 border border-amber-400/40"
+            className="flex items-center space-x-1.5 px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl bg-[#1e354d] hover:bg-[#162a3f] text-white shadow-sm transition-all transform active:scale-95"
             title="Administrator Portal Login (Password required)"
           >
-            <Shield className="w-4 h-4 fill-slate-950" />
+            <Shield className="w-4 h-4 fill-white text-[#1e354d]" />
             <span>Admin Login</span>
           </button>
         </div>
       </header>
 
-      {/* 2. CENTERED AUTH CARD CONTAINER */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-md bg-slate-900/95 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/80 relative backdrop-blur-md overflow-hidden animate-fadeIn">
-          {/* Ambient gold background glow */}
-          <div className="absolute -top-24 -right-24 w-52 h-52 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* 2. BREADCRUMB & HEADER TAG */}
+      <div className="max-w-md mx-auto w-full px-4 pt-6 text-left">
+        <div className="text-[12px] font-mono text-[#64748b] mb-2 flex items-center gap-1.5">
+          <span>Home</span>
+          <span>/</span>
+          <span className="text-[#11202f] font-semibold">Auditorium Block Planner</span>
+        </div>
+        <div className="inline-block px-3 py-1 bg-[#dbe4eb] text-[#1e354d] text-[11px] font-mono font-bold uppercase rounded-lg border border-[#cad7e2] tracking-wider mb-2">
+          PLANNERS
+        </div>
+      </div>
 
-          {/* College Logo Banner in Center */}
+      {/* 3. CENTERED AUTH CARD (SPACEPLANNER THEME) */}
+      <main className="flex-1 flex items-center justify-center px-4 pb-12">
+        <div className="w-full max-w-md bg-white border border-[#ded4c0] rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#11202f]/5 relative overflow-hidden animate-fadeIn">
+          {/* Logo & Headline */}
           <div className="text-center mb-6">
             <img
               src="/logo.png"
               alt="SEC Logo"
-              className="w-16 h-16 rounded-full mx-auto mb-3 object-cover ring-4 ring-amber-500/40 shadow-xl shadow-amber-500/20"
+              className="w-16 h-16 rounded-full mx-auto mb-3 object-cover ring-4 ring-[#f1ede4] shadow-md"
             />
-            <h1 className="text-xl sm:text-2xl font-serif font-black text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-serif font-black text-[#11202f] tracking-tight">
               SEC வரைபடம்
             </h1>
-            <p className="text-xs text-amber-300/80 font-mono mt-0.5">
-              AUDITORIUM BLOCK • SAVEETHA ENGINEERING COLLEGE
+            <p className="text-xs text-[#64748b] font-sans mt-1">
+              Plan your route across Auditorium Block (Ground to 6th Floor)
             </p>
           </div>
 
           {/* Auth Tab Switcher: Sign In vs Create Account */}
-          <div className="flex bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 mb-6">
+          <div className="flex bg-[#f7f5ee] p-1.5 rounded-2xl border border-[#ded4c0] mb-6">
             <button
               type="button"
               onClick={() => {
@@ -143,8 +152,8 @@ export const LandingPage: React.FC = () => {
               }}
               className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
                 authTab === 'signin'
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1e354d] text-white shadow-sm'
+                  : 'text-[#64748b] hover:text-[#11202f]'
               }`}
             >
               <LogIn className="w-3.5 h-3.5" />
@@ -159,8 +168,8 @@ export const LandingPage: React.FC = () => {
               }}
               className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
                 authTab === 'signup'
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1e354d] text-white shadow-sm'
+                  : 'text-[#64748b] hover:text-[#11202f]'
               }`}
             >
               <UserPlus className="w-3.5 h-3.5" />
@@ -170,19 +179,19 @@ export const LandingPage: React.FC = () => {
 
           {/* Active user status banner if already signed in */}
           {user && (
-            <div className="mb-4 p-3 bg-blue-950/40 border border-blue-500/30 rounded-2xl flex items-center justify-between">
+            <div className="mb-4 p-3 bg-[#f7f5ee] border border-[#ded4c0] rounded-2xl flex items-center justify-between">
               <div className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 rounded-full bg-blue-600/30 text-blue-300 flex items-center justify-center font-bold text-xs">
-                  {user.role === 'admin' ? <Shield className="w-3.5 h-3.5 text-amber-400" /> : <GraduationCap className="w-3.5 h-3.5" />}
+                <div className="w-7 h-7 rounded-full bg-[#dbe4eb] text-[#1e354d] flex items-center justify-center font-bold text-xs">
+                  {user.role === 'admin' ? <Shield className="w-3.5 h-3.5 text-[#1e354d]" /> : <GraduationCap className="w-3.5 h-3.5 text-[#1e354d]" />}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-white truncate">{user.displayName || user.email}</p>
-                  <span className="text-[10px] font-mono text-blue-300 uppercase">{user.role} active</span>
+                  <p className="text-xs font-bold text-[#11202f] truncate">{user.displayName || user.email}</p>
+                  <span className="text-[10px] font-mono text-[#64748b] uppercase">{user.role} active</span>
                 </div>
               </div>
               <button
                 onClick={() => logout()}
-                className="text-[11px] text-red-400 hover:text-red-300 font-semibold underline"
+                className="text-[11px] text-rose-600 hover:text-rose-700 font-semibold underline"
               >
                 Sign Out
               </button>
@@ -191,7 +200,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Error Banner */}
           {authError && (
-            <div className="mb-4 p-3 bg-red-950/60 border border-red-500/40 rounded-xl text-red-200 text-xs animate-shake">
+            <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs animate-shake">
               {authError}
             </div>
           )}
@@ -200,53 +209,53 @@ export const LandingPage: React.FC = () => {
           <form onSubmit={handleAuthSubmit} className="space-y-3.5">
             {authTab === 'signup' && (
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-[#11202f] mb-1">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+                  <User className="absolute left-3.5 top-3 w-4 h-4 text-[#8a99a8]" />
                   <input
                     type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
-                    className="w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full pl-10 pr-3 py-2.5 bg-[#faf8f3] border border-[#ded4c0] focus:border-[#1e354d] focus:ring-2 focus:ring-[#1e354d]/10 rounded-xl text-xs text-[#11202f] placeholder-[#8a99a8] focus:outline-none transition"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#11202f] mb-1">
                 Student / Faculty Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+                <Mail className="absolute left-3.5 top-3 w-4 h-4 text-[#8a99a8]" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="student@saveetha.ac.in"
-                  className="w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2.5 bg-[#faf8f3] border border-[#ded4c0] focus:border-[#1e354d] focus:ring-2 focus:ring-[#1e354d]/10 rounded-xl text-xs text-[#11202f] placeholder-[#8a99a8] focus:outline-none transition"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-[#11202f] mb-1">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+                <Lock className="absolute left-3.5 top-3 w-4 h-4 text-[#8a99a8]" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-10 pr-3 py-2.5 bg-[#faf8f3] border border-[#ded4c0] focus:border-[#1e354d] focus:ring-2 focus:ring-[#1e354d]/10 rounded-xl text-xs text-[#11202f] placeholder-[#8a99a8] focus:outline-none transition"
                 />
               </div>
             </div>
@@ -254,30 +263,30 @@ export const LandingPage: React.FC = () => {
             <button
               type="submit"
               disabled={authLoading}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg shadow-blue-600/25 transition active:scale-[0.98] disabled:opacity-50"
+              className="w-full py-3 bg-[#1e354d] hover:bg-[#162a3f] text-white font-bold rounded-xl text-xs sm:text-sm shadow-md transition active:scale-[0.98] disabled:opacity-50"
             >
               {authLoading
                 ? 'Verifying...'
                 : authTab === 'signin'
-                ? 'Sign In to Campus Map'
+                ? 'Sign In to Planner'
                 : 'Create Account'}
             </button>
           </form>
 
           {/* Divider */}
           <div className="flex items-center my-4">
-            <div className="flex-1 border-t border-slate-800"></div>
-            <span className="px-3 text-[10px] text-slate-500 uppercase font-mono tracking-wider">
+            <div className="flex-1 border-t border-[#ded4c0]"></div>
+            <span className="px-3 text-[10px] text-[#8a99a8] uppercase font-mono tracking-wider">
               or continue with
             </span>
-            <div className="flex-1 border-t border-slate-800"></div>
+            <div className="flex-1 border-t border-[#ded4c0]"></div>
           </div>
 
           {/* Google Sign In */}
           <button
             onClick={handleGoogleLogin}
             disabled={authLoading}
-            className="w-full flex items-center justify-center space-x-2.5 py-2.5 px-4 bg-slate-800 hover:bg-slate-750 text-white font-semibold rounded-xl text-xs transition border border-slate-700 active:scale-[0.98]"
+            className="w-full flex items-center justify-center space-x-2.5 py-2.5 px-4 bg-[#faf8f3] hover:bg-[#ede5d6] text-[#11202f] font-semibold rounded-xl text-xs transition border border-[#ded4c0] active:scale-[0.98]"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path
@@ -301,14 +310,14 @@ export const LandingPage: React.FC = () => {
           </button>
 
           {/* Quick Continue */}
-          <div className="mt-4 pt-3 border-t border-slate-800/80 text-center">
+          <div className="mt-4 pt-3 border-t border-[#ded4c0] text-center">
             <button
               type="button"
               onClick={handleStudentContinue}
-              className="text-xs text-amber-400 hover:text-amber-300 font-medium inline-flex items-center gap-1 transition"
+              className="text-xs text-[#1e354d] hover:text-blue-700 font-bold inline-flex items-center gap-1 transition"
             >
               <span>Quick Student Entry</span>
-              <ArrowRight className="w-3 h-3" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>

@@ -41,7 +41,7 @@ export const RouteSelectionPage: React.FC = () => {
     const trimmedTarget = targetRoomNumber.trim();
 
     if (!trimmedTarget) {
-      setError('Please enter a destination class number (e.g. 6853, 6411, 4151).');
+      setError('Please enter a destination class number (e.g. 6681, 5371, 4331, 2411, 1581, 0481).');
       return;
     }
 
@@ -50,28 +50,23 @@ export const RouteSelectionPage: React.FC = () => {
       return;
     }
 
-    // Determine start floor:
-    // If it's a 4-digit room like 6853 -> Floor 6, 4151 -> Floor 4
-    let sFloor = 6;
-    if (/^[1-6]\d{3}$/.test(trimmedStart)) {
-      sFloor = parseInt(trimmedStart[0], 10);
-    } else {
+    const resolveFloor = (code: string): number => {
       const match = allBuildingDestinations.find(
-        (r) => r.id.toLowerCase() === trimmedStart.toLowerCase()
+        (r) => r.id.toLowerCase() === code.toLowerCase()
       );
-      if (match?.floor) sFloor = match.floor;
-    }
+      if (match?.floor) return match.floor;
 
-    // Determine target floor:
-    let tFloor = 6;
-    if (/^[1-6]\d{3}$/.test(trimmedTarget)) {
-      tFloor = parseInt(trimmedTarget[0], 10);
-    } else {
-      const match = allBuildingDestinations.find(
-        (r) => r.id.toLowerCase() === trimmedTarget.toLowerCase()
-      );
-      if (match?.floor) tFloor = match.floor;
-    }
+      if (/^0\d{3}$/.test(code) || /^[4-8]\d{2}$/.test(code)) return 1; // Ground Floor Mech (0481, 481, 0851)
+      if (/^1\d{3}$/.test(code)) return 2; // 1st Floor IT (1581, 1611, 1411)
+      if (/^2\d{3}$/.test(code) || code.startsWith('356') || /^3\d{3}$/.test(code)) return 3; // 3rd Floor AIDS/ECE (2411, 3561)
+      if (/^4\d{3}$/.test(code)) return 4; // 4th Floor Chemical (4331, 4611)
+      if (/^5\d{3}$/.test(code)) return 5; // 5th Floor Biomedical (5371, 5581)
+      if (/^6\d{3}$/.test(code)) return 6; // 6th Floor MBA (6681, 6411, 6853)
+      return 6;
+    };
+
+    const sFloor = resolveFloor(trimmedStart);
+    const tFloor = resolveFloor(trimmedTarget);
 
     // Navigate to Map with just the room numbers
     navigate(
@@ -82,27 +77,27 @@ export const RouteSelectionPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f18] text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950">
-      {/* 1. TOP HEADER */}
-      <header className="sticky top-0 z-40 w-full bg-[#0d1522]/90 backdrop-blur-md border-b border-slate-800/80 px-4 sm:px-8 py-3 flex items-center justify-between shadow-lg">
+    <div className="min-h-screen bg-[#f7f5ee] spaceplanner-grid-bg text-[#11202f] flex flex-col selection:bg-[#dbe4eb] selection:text-[#1e354d]">
+      {/* 1. TOP HEADER (SPACEPLANNER THEME) */}
+      <header className="sticky top-0 z-40 w-full bg-[#fcfaf6]/95 backdrop-blur-md border-b border-[#ded4c0] px-4 sm:px-8 py-3 flex items-center justify-between shadow-xs">
         {/* Brand */}
         <Link to="/" className="flex items-center space-x-3 group">
           <img
             src="/logo.png"
             alt="SEC Logo"
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-amber-500/50 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover ring-2 ring-[#ded4c0] shadow-sm group-hover:scale-105 transition-transform"
           />
           <div>
             <div className="flex items-center space-x-2">
-              <span className="font-serif font-black text-base sm:text-lg tracking-tight bg-gradient-to-r from-amber-400 via-amber-200 to-white bg-clip-text text-transparent">
+              <span className="font-serif font-black text-base sm:text-lg tracking-tight text-[#11202f]">
                 SEC வரைபடம்
               </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.2 text-[8.5px] font-mono uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded font-bold">
+              <span className="hidden sm:inline-block px-2 py-0.5 text-[8.5px] font-mono uppercase bg-[#dbe4eb] text-[#1e354d] border border-[#cad7e2] rounded-full font-bold">
                 ROUTE PLANNER
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 hidden sm:block">
-              Saveetha Engineering College • Auditorium Block Indoor Navigation
+            <p className="text-[10px] text-[#64748b] hidden sm:block">
+              Saveetha Engineering College • Auditorium Block
             </p>
           </div>
         </Link>
@@ -110,16 +105,16 @@ export const RouteSelectionPage: React.FC = () => {
         {/* User Status & Admin Login */}
         <div className="flex items-center space-x-2.5">
           {user && (
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs">
-              <div className="w-5 h-5 rounded-full bg-blue-600/30 text-blue-300 flex items-center justify-center font-bold text-[10px]">
-                {isAdmin ? <Shield className="w-3 h-3 text-amber-400" /> : <GraduationCap className="w-3 h-3 text-blue-400" />}
+            <div className="flex items-center space-x-2 px-3 py-1.5 bg-[#fcfaf6] border border-[#ded4c0] rounded-xl text-xs">
+              <div className="w-5 h-5 rounded-full bg-[#dbe4eb] text-[#1e354d] flex items-center justify-center font-bold text-[10px]">
+                {isAdmin ? <Shield className="w-3 h-3 text-[#1e354d]" /> : <GraduationCap className="w-3 h-3 text-[#1e354d]" />}
               </div>
-              <span className="font-medium text-slate-200 max-w-[120px] truncate hidden md:inline">
+              <span className="font-medium text-[#11202f] max-w-[120px] truncate hidden md:inline">
                 {user.displayName || user.email}
               </span>
               <button
                 onClick={() => logout()}
-                className="text-slate-400 hover:text-red-400 transition ml-1"
+                className="text-[#8a99a8] hover:text-rose-600 transition ml-1"
                 title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -129,38 +124,47 @@ export const RouteSelectionPage: React.FC = () => {
 
           <button
             onClick={() => setIsAdminModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 transition active:scale-95"
+            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-[#1e354d] hover:bg-[#162a3f] text-white shadow-sm transition active:scale-95"
             title="Administrator Login (Password only)"
           >
-            <Shield className="w-3.5 h-3.5 text-amber-400" />
+            <Shield className="w-3.5 h-3.5 fill-white text-[#1e354d]" />
             <span>Admin Login</span>
           </button>
         </div>
       </header>
 
-      {/* 2. SOURCE & DESTINATION SELECTION CARD (NO PRE-FILLED TEXT, NO SUGGESTIONS) */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 sm:py-12">
-        <div className="w-full max-w-md bg-slate-900/95 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-black/80 relative backdrop-blur-md space-y-6 animate-fadeIn">
-          {/* Ambient Glow */}
-          <div className="absolute -top-20 -right-20 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* 2. BREADCRUMB & HEADER TAG */}
+      <div className="max-w-md mx-auto w-full px-4 pt-6 text-left">
+        <div className="text-[12px] font-mono text-[#64748b] mb-2 flex items-center gap-1.5">
+          <Link to="/" className="hover:underline">Home</Link>
+          <span>/</span>
+          <span className="text-[#11202f] font-semibold">Route Planner</span>
+        </div>
+        <div className="inline-block px-3 py-1 bg-[#dbe4eb] text-[#1e354d] text-[11px] font-mono font-bold uppercase rounded-lg border border-[#cad7e2] tracking-wider mb-2">
+          WAYFINDING
+        </div>
+      </div>
 
+      {/* 3. SOURCE & DESTINATION SELECTION CARD (SPACEPLANNER THEME) */}
+      <main className="flex-1 flex items-center justify-center px-4 pb-12">
+        <div className="w-full max-w-md bg-white border border-[#ded4c0] rounded-3xl p-6 sm:p-8 shadow-xl shadow-[#11202f]/5 relative space-y-6 animate-fadeIn">
           {/* Title Header */}
-          <div className="text-center space-y-1.5 pb-2 border-b border-slate-800">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto shadow-md">
+          <div className="text-center space-y-1.5 pb-2 border-b border-[#ded4c0]">
+            <div className="w-12 h-12 rounded-2xl bg-[#dbe4eb] text-[#1e354d] flex items-center justify-center mx-auto shadow-xs border border-[#cad7e2]">
               <Navigation className="w-6 h-6" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-serif font-black text-white tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-serif font-black text-[#11202f] tracking-tight">
               Type Classroom Number
             </h1>
-            <p className="text-xs text-slate-400">
-              Enter your starting point and destination class number to view the navigation route.
+            <p className="text-xs text-[#64748b]">
+              Enter starting point and destination room to generate your blueprint route.
             </p>
           </div>
 
           {/* Error Banner */}
           {error && (
-            <div className="flex items-center gap-2 p-3 bg-red-950/60 border border-red-500/40 rounded-2xl text-red-200 text-xs animate-shake">
-              <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+            <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-xs animate-shake">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
@@ -169,16 +173,16 @@ export const RouteSelectionPage: React.FC = () => {
           <form onSubmit={handleCalculateAndShowMap} className="space-y-4">
             {/* STARTING LOCATION INPUT */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                  <MapPin className="w-3.5 h-3.5" />
+              <label className="block text-xs font-semibold text-[#11202f] mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-[#1e354d] font-bold">
+                  <MapPin className="w-3.5 h-3.5 text-blue-600" />
                   <span>Starting Point</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-500">Optional (Default: SW Lift)</span>
+                <span className="text-[10px] font-mono text-[#8a99a8]">Default: lift_sw</span>
               </label>
 
               <div className="relative">
-                <MapPin className="absolute left-3.5 top-3.5 w-4 h-4 text-emerald-400" />
+                <MapPin className="absolute left-3.5 top-3.5 w-4 h-4 text-blue-600" />
                 <input
                   type="text"
                   autoComplete="off"
@@ -188,7 +192,7 @@ export const RouteSelectionPage: React.FC = () => {
                     if (error) setError(null);
                   }}
                   placeholder="e.g. lift_sw, 6411, 4151 (Default: lift_sw)"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 rounded-2xl text-xs sm:text-sm font-mono text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition"
+                  className="w-full pl-10 pr-4 py-3 bg-[#faf8f3] border border-[#ded4c0] focus:border-[#1e354d] focus:ring-2 focus:ring-[#1e354d]/10 rounded-2xl text-xs sm:text-sm font-mono text-[#11202f] placeholder-[#8a99a8] focus:outline-none transition"
                 />
               </div>
             </div>
@@ -198,7 +202,7 @@ export const RouteSelectionPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSwap}
-                className="p-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-white rounded-full transition shadow-sm active:scale-95"
+                className="p-1.5 bg-[#faf8f3] hover:bg-[#ede5d6] border border-[#ded4c0] text-[#64748b] hover:text-[#11202f] rounded-full transition shadow-2xs active:scale-95"
                 title="Swap Starting Point & Destination"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -207,16 +211,16 @@ export const RouteSelectionPage: React.FC = () => {
 
             {/* DESTINATION CLASSROOM INPUT */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-amber-400 font-bold">
-                  <Navigation className="w-3.5 h-3.5" />
+              <label className="block text-xs font-semibold text-[#11202f] mb-1.5 flex items-center justify-between">
+                <span className="flex items-center gap-1.5 text-[#1e354d] font-bold">
+                  <Navigation className="w-3.5 h-3.5 text-blue-600" />
                   <span>Destination Class Number</span>
                 </span>
-                <span className="text-[10px] font-mono text-amber-400">Required</span>
+                <span className="text-[10px] font-mono text-blue-600 font-bold">Required</span>
               </label>
 
               <div className="relative">
-                <Navigation className="absolute left-3.5 top-3.5 w-4 h-4 text-amber-400" />
+                <Navigation className="absolute left-3.5 top-3.5 w-4 h-4 text-blue-600" />
                 <input
                   type="text"
                   autoFocus
@@ -227,8 +231,8 @@ export const RouteSelectionPage: React.FC = () => {
                     setTargetRoomNumber(e.target.value);
                     if (error) setError(null);
                   }}
-                  placeholder="e.g. 6853, 6411, 4151, auditorium"
-                  className="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 rounded-2xl text-xs sm:text-sm font-mono text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
+                  placeholder="e.g. 6681, 5371, 4331, 2411, 1581, 0481"
+                  className="w-full pl-10 pr-4 py-3 bg-[#faf8f3] border border-[#ded4c0] focus:border-[#1e354d] focus:ring-2 focus:ring-[#1e354d]/10 rounded-2xl text-xs sm:text-sm font-mono text-[#11202f] placeholder-[#8a99a8] focus:outline-none transition"
                 />
               </div>
             </div>
@@ -236,10 +240,10 @@ export const RouteSelectionPage: React.FC = () => {
             {/* SUBMIT BUTTON - SHOW MAP */}
             <button
               type="submit"
-              className="w-full mt-5 py-3.5 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl text-sm shadow-xl shadow-blue-600/30 transition flex items-center justify-center space-x-2 active:scale-[0.98]"
+              className="w-full mt-5 py-3.5 px-6 bg-[#1e354d] hover:bg-[#162a3f] text-white font-bold rounded-2xl text-sm shadow-md transition flex items-center justify-center space-x-2 active:scale-[0.98]"
             >
-              <Compass className="w-4 h-4" />
-              <span>Show Route & Open Map</span>
+              <Compass className="w-4 h-4 text-[#ded4c0]" />
+              <span>Show Route & Open Blueprint Map</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

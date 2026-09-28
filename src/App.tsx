@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { RoomsProvider } from './context/RoomsContext';
 import { LandingPage } from './pages/LandingPage';
+import { RouteSelectionPage } from './pages/RouteSelectionPage';
 import { HomePage } from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -81,10 +82,10 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
             <span>Home</span>
           </Link>
           <Link
-            to="/map"
+            to="/route"
             className="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition font-medium"
           >
-            <span>Campus Map</span>
+            <span>Plan Route</span>
             <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
           </Link>
         </div>
@@ -99,6 +100,7 @@ export function App() {
       <RoomsProvider>
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/route" element={<RouteSelectionPage />} />
           <Route path="/map" element={<HomePage />} />
           <Route
             path="/admin"

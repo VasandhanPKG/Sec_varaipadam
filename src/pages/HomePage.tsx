@@ -4,7 +4,7 @@ import { Header } from '../components/ui/Header';
 import { BlueprintCanvas } from '../components/2d/BlueprintCanvas';
 import { Building3DScene } from '../components/3d/Building3DScene';
 import { EntityItem, RouteResult, ViewMode } from '../types';
-import { calculateMultiFloorRoute } from '../lib/pathfinding';
+import { calculateMultiFloorRoute, resolveRoomFloor } from '../lib/pathfinding';
 import { useRooms } from '../context/RoomsContext';
 import {
   ArrowLeft,
@@ -39,15 +39,8 @@ export function HomePage() {
     startFloorArg?: number,
     targetFloorArg?: number
   ) => {
-    let sFloor = startFloorArg ?? currentFloor;
-    let tFloor = targetFloorArg ?? currentFloor;
-
-    if (/^[1-6]\d{3}$/.test(startId)) {
-      sFloor = parseInt(startId[0], 10);
-    }
-    if (/^[1-6]\d{3}$/.test(endId)) {
-      tFloor = parseInt(endId[0], 10);
-    }
+    const sFloor = resolveRoomFloor(startId, startFloorArg ?? currentFloor, allBuildingDestinations);
+    const tFloor = resolveRoomFloor(endId, targetFloorArg ?? sFloor, allBuildingDestinations);
 
     const res = calculateMultiFloorRoute(
       startId,
@@ -61,13 +54,16 @@ export function HomePage() {
     if (res) {
       setActiveRoute(res);
       setSelectedEntity(res.targetEntity);
+      if (res.targetFloor !== currentFloor && !res.isMultiFloor) {
+        setCurrentFloor(res.targetFloor);
+      }
     }
   };
 
   // Handle entity selection (canvas click or search pick)
   const handleSelectEntity = (entity: EntityItem) => {
     setSelectedEntity(entity);
-    const entityFloor = entity.floor || (/^[1-6]\d{3}$/.test(entity.id) ? parseInt(entity.id[0], 10) : currentFloor);
+    const entityFloor = resolveRoomFloor(entity.id, entity.floor ?? currentFloor, allBuildingDestinations);
     if (entityFloor !== currentFloor) {
       setCurrentFloor(entityFloor);
     }
@@ -86,29 +82,15 @@ export function HomePage() {
     const sFloorParam = searchParams.get('sFloor');
     const tFloorParam = searchParams.get('tFloor') || searchParams.get('floor');
 
-    const resolveFloor = (code: string, fallbackFloor?: number): number => {
-      if (fallbackFloor && !isNaN(fallbackFloor)) return fallbackFloor;
-      const match = allBuildingDestinations.find(
-        (r) => r.id.toLowerCase() === code.toLowerCase()
-      );
-      if (match?.floor) return match.floor;
-
-      if (/^0\d{3}$/.test(code) || /^[4-8]\d{2}$/.test(code)) return 1; // Ground Floor Mech
-      if (/^1\d{3}$/.test(code)) return 2; // 1st Floor IT
-      if (/^2\d{3}$/.test(code) || code.startsWith('356') || /^3\d{3}$/.test(code)) return 3; // 3rd Floor AIDS/ECE
-      if (/^4\d{3}$/.test(code)) return 4; // 4th Floor Chemical
-      if (/^5\d{3}$/.test(code)) return 5; // 5th Floor Biomedical
-      if (/^6\d{3}$/.test(code)) return 6; // 6th Floor MBA
-      return 6;
-    };
-
-    const sFloor = resolveFloor(
+    const sFloor = resolveRoomFloor(
       startParam,
-      sFloorParam ? parseInt(sFloorParam, 10) : undefined
+      sFloorParam ? parseInt(sFloorParam, 10) : undefined,
+      allBuildingDestinations
     );
-    const tFloor = resolveFloor(
+    const tFloor = resolveRoomFloor(
       targetParam,
-      tFloorParam ? parseInt(tFloorParam, 10) : undefined
+      tFloorParam ? parseInt(tFloorParam, 10) : sFloor,
+      allBuildingDestinations
     );
 
     // Set initial active floor to target floor

@@ -25,6 +25,7 @@ import {
   RouteResult,
 } from '../../types';
 import { useRooms } from '../../context/RoomsContext';
+import { resolveRoomFloor } from '../../lib/pathfinding';
 
 interface BlueprintCanvasProps {
   activeRoute: RouteResult | null;
@@ -212,10 +213,12 @@ export function BlueprintCanvas({
   // Active route points for current displayed floor
   const currentFloorSegment = activeRoute?.floorSegments?.[currentFloor];
   const activeFloorPoints =
-    currentFloorSegment?.routePoints ||
-    (activeRoute && !activeRoute.isMultiFloor && activeRoute.startFloor === currentFloor
+    currentFloorSegment?.routePoints && currentFloorSegment.routePoints.length > 0
+      ? currentFloorSegment.routePoints
+      : activeRoute?.activeFloorRoutePoints &&
+        (activeRoute.startFloor === currentFloor || activeRoute.targetFloor === currentFloor)
       ? activeRoute.activeFloorRoutePoints
-      : []);
+      : [];
 
   const routePathD = React.useMemo(() => {
     if (!activeFloorPoints || activeFloorPoints.length === 0) return '';
@@ -230,21 +233,19 @@ export function BlueprintCanvas({
   const endPoint = activeFloorPoints && activeFloorPoints.length > 0 ? activeFloorPoints[activeFloorPoints.length - 1] : null;
 
   const handleTriggerRoute = () => {
-    let sFloor = currentFloor;
-    let tFloor = currentFloor;
+    const rawTarget = destInputText.trim() || demoTargetId.trim();
+    const rawStart = startInputText.trim() || demoStartId.trim() || 'lift_sw';
 
-    if (/^[1-6]\d{3}$/.test(demoStartId)) {
-      sFloor = parseInt(demoStartId[0], 10);
-    }
-    if (/^[1-6]\d{3}$/.test(demoTargetId)) {
-      tFloor = parseInt(demoTargetId[0], 10);
-    }
+    if (!rawTarget) return;
+
+    const allFlat = Object.values(allFloorsRooms).flat();
+    const sFloor = resolveRoomFloor(rawStart, currentFloor, allFlat);
+    const tFloor = resolveRoomFloor(rawTarget, currentFloor, allFlat);
 
     if (onCalculateRoute) {
-      onCalculateRoute(demoStartId, demoTargetId, sFloor, tFloor);
+      onCalculateRoute(rawStart, rawTarget, sFloor, tFloor);
     } else {
-      const allFlat = Object.values(allFloorsRooms).flat();
-      const target = allFlat.find((r) => r.id === demoTargetId) || { id: demoTargetId, name: `Room ${demoTargetId}` };
+      const target = allFlat.find((r) => r.id === rawTarget) || { id: rawTarget, name: `Room ${rawTarget}`, floor: tFloor };
       onSelectEntity(target as EntityItem);
     }
     setIsDirectionsExpanded(true);

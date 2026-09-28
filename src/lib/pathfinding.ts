@@ -593,48 +593,170 @@ function pickOptimalVerticalCore(
   return bestCore;
 }
 
-// Helper to synthesize entity if not found in database
-function findOrSynthesizeEntity(
+// Universal Room & Floor Resolver
+export function resolveRoomFloor(
+  code: string,
+  currentOrFallbackFloor?: number,
+  allPool?: EntityItem[]
+): number {
+  if (!code) return currentOrFallbackFloor ?? 6;
+  const clean = code.trim().toLowerCase();
+
+  // 1. Check pool for exact or fuzzy match
+  if (allPool && allPool.length > 0) {
+    const direct = allPool.find(
+      (r) =>
+        r.id.toLowerCase() === clean ||
+        r.std?.toLowerCase() === clean ||
+        r.name.toLowerCase() === clean
+    );
+    if (direct?.floor) return direct.floor;
+  }
+
+  // Extract digits from string (e.g. "Room 6853" -> "6853")
+  const digitMatch = clean.match(/\d+/);
+  const digits = digitMatch ? digitMatch[0] : '';
+
+  if (digits.length === 4) {
+    if (digits.startsWith('0')) return 1; // Ground Floor Mech
+    if (digits.startsWith('1')) return 2; // 1st Floor IT
+    if (digits.startsWith('2') || digits.startsWith('3')) return 3; // 3rd Floor AIDS/ECE
+    if (digits.startsWith('4')) return 4; // 4th Floor Chemical
+    if (digits.startsWith('5')) return 5; // 5th Floor Biomedical
+    if (digits.startsWith('6')) return 6; // 6th Floor MBA
+  }
+
+  if (digits.length === 3) {
+    if (currentOrFallbackFloor && currentOrFallbackFloor >= 1 && currentOrFallbackFloor <= 6) {
+      return currentOrFallbackFloor;
+    }
+    return 6;
+  }
+
+  return currentOrFallbackFloor ?? 6;
+}
+
+// Helper to find or synthesize entity if not found in database
+export function findOrSynthesizeEntity(
   id: string,
   floor: number,
   allPool: EntityItem[]
 ): EntityItem {
-  let found = allPool.find((e) => e.id === id);
+  if (!id) {
+    return {
+      id: 'lift_sw',
+      name: 'South-West Lift',
+      type: 'lift',
+      floor,
+      x: 292,
+      y: 840,
+      w: 32,
+      h: 32,
+      doorX: 357,
+      doorY: 875,
+      desc: `South-West Lift Lobby Floor ${floor}`,
+    };
+  }
+
+  const cleanRaw = id.trim().toLowerCase();
+
+  // Extract raw digits if user entered e.g. "Room 6853 (Design)"
+  const digitMatch = cleanRaw.match(/\d+/);
+  const cleanDigits = digitMatch ? digitMatch[0] : cleanRaw;
+
+  // 1. Direct ID match
+  let found = allPool.find(
+    (e) => e.id.toLowerCase() === cleanRaw || e.id.toLowerCase() === cleanDigits
+  );
   if (found) return found;
 
-  const core = CORES_DATA.find((c) => c.id === id);
-  if (core) return core;
+  // 2. Match by std or name on target floor
+  let matchOnFloor = allPool.find(
+    (e) =>
+      (e.floor === floor || !e.floor) &&
+      (e.std?.toLowerCase() === cleanRaw ||
+        e.std?.toLowerCase() === cleanDigits ||
+        e.id.toLowerCase().endsWith(cleanDigits) ||
+        e.name.toLowerCase().includes(cleanRaw))
+  );
+  if (matchOnFloor) return matchOnFloor;
 
-  // Synthesize from 4-digit code
+  // 3. Match 3-digit shorthand on current floor (e.g. "651" on floor 6 -> "6651", on floor 1 -> "0651")
+  if (/^\d{3}$/.test(cleanDigits)) {
+    const flPrefix = floor === 1 ? '0' : floor.toString();
+    const cand1 = `${flPrefix}${cleanDigits}`;
+    const cand2 = `${flPrefix}${cleanDigits[0]}${cleanDigits.slice(1)}`;
+    const candidateMatch = allPool.find(
+      (e) =>
+        e.floor === floor &&
+        (e.id === cand1 || e.id === cand2 || e.std === cleanDigits || e.id.endsWith(cleanDigits))
+    );
+    if (candidateMatch) return candidateMatch;
+  }
+
+  // 4. Check Cores
+  const core = CORES_DATA.find(
+    (c) => c.id.toLowerCase() === cleanRaw || c.id.toLowerCase() === cleanDigits
+  );
+  if (core) return { ...core, floor };
+
+  // 5. Synthesize intelligent coordinates matching the floor layout
   let row = 4;
   let col = 5;
   let bay = 1;
 
-  if (/^\d{4}$/.test(id)) {
-    row = parseInt(id[1], 10);
-    col = parseInt(id[2], 10);
-    bay = parseInt(id[3], 10);
+  if (/^\d{4}$/.test(cleanDigits)) {
+    row = parseInt(cleanDigits[1], 10);
+    col = parseInt(cleanDigits[2], 10);
+    bay = parseInt(cleanDigits[3], 10);
+  } else if (/^\d{3}$/.test(cleanDigits)) {
+    row = parseInt(cleanDigits[0], 10);
+    col = parseInt(cleanDigits[1], 10);
+    bay = parseInt(cleanDigits[2], 10);
   }
 
-  const defaultDoorX = col <= 4 ? 370 : 610;
-  const defaultDoorY = 200 + (8 - row) * 100;
+  let defaultDoorX = 500;
+  let defaultDoorY = 430;
+
+  if (row === 8) {
+    defaultDoorX = col <= 3 ? 345 : col >= 7 ? 655 : 382 + Math.min(bay - 1, 3) * 60;
+    defaultDoorY = 225;
+  } else if (row === 7) {
+    defaultDoorX = col <= 4 ? 357 : 642;
+    defaultDoorY = 280;
+  } else if (row === 6) {
+    defaultDoorX = col <= 3 ? 120 + (bay - 1) * 65 : col >= 8 ? 750 + (bay - 1) * 65 : 382 + Math.min(bay - 1, 3) * 60;
+    defaultDoorY = 415;
+  } else if (row === 5) {
+    defaultDoorX = col <= 2 ? 185 : col >= 8 ? 830 : col === 4 ? 365 : 635;
+    defaultDoorY = 520;
+  } else if (row === 4) {
+    defaultDoorX = col <= 2 ? 125 + (bay - 1) * 65 : col >= 8 ? 759 + (bay - 1) * 62 : 382 + Math.min(bay - 1, 3) * 60;
+    defaultDoorY = 620;
+  } else if (row === 3) {
+    defaultDoorX = col <= 4 ? 345 : 655;
+    defaultDoorY = 760;
+  } else if (row <= 2) {
+    defaultDoorX = 500;
+    defaultDoorY = 900;
+  }
 
   return {
-    id,
-    std: id.slice(1),
-    name: `Space ${id}`,
+    id: cleanDigits || id,
+    std: cleanDigits.length === 4 ? cleanDigits.slice(1) : cleanDigits,
+    name: `Room ${cleanDigits || id}`,
     type: 'classroom',
     floor,
     row,
     col,
     bay,
-    x: defaultDoorX - 30,
-    y: defaultDoorY - 30,
-    w: 60,
-    h: 60,
+    x: defaultDoorX - 28,
+    y: defaultDoorY - 28,
+    w: 56,
+    h: 56,
     doorX: defaultDoorX,
     doorY: defaultDoorY,
-    desc: `Floor ${floor} Space (${id})`,
+    desc: `Floor ${floor} Space (${cleanDigits || id})`,
   };
 }
 
@@ -647,32 +769,25 @@ export function calculateMultiFloorRoute(
   allFloorsRoomsMap?: Record<number, RoomItem[]>,
   allDestinationsList?: EntityItem[]
 ): RouteResult | null {
-  // 1. Auto-infer floor from 4-digit codes if present
-  let startFloor = startFloorArg ?? 6;
-  if (/^[1-6]\d{3}$/.test(startEntityId)) {
-    startFloor = parseInt(startEntityId[0], 10);
-  }
-
-  let targetFloor = targetFloorArg ?? 6;
-  if (/^[1-6]\d{3}$/.test(targetEntityId)) {
-    targetFloor = parseInt(targetEntityId[0], 10);
-  }
-
-  // 2. Build complete room registries
-  const startRooms =
-    allFloorsRoomsMap?.[startFloor] || generateDefaultRoomsForFloor(startFloor);
-  const targetRooms =
-    allFloorsRoomsMap?.[targetFloor] || generateDefaultRoomsForFloor(targetFloor);
-
+  // 1. Build complete room registries
   const allAvailableRooms = allFloorsRoomsMap
     ? Object.values(allFloorsRoomsMap).flat()
-    : [...startRooms, ...targetRooms];
+    : [1, 2, 3, 4, 5, 6].flatMap((fl) => generateDefaultRoomsForFloor(fl));
 
   const pool = [
     ...(allDestinationsList || []),
     ...allAvailableRooms,
     ...CORES_DATA,
   ];
+
+  // 2. Resolve start & target floors
+  const startFloor = resolveRoomFloor(startEntityId, startFloorArg ?? 6, pool);
+  const targetFloor = resolveRoomFloor(targetEntityId, targetFloorArg ?? startFloor, pool);
+
+  const startRooms =
+    allFloorsRoomsMap?.[startFloor] || generateDefaultRoomsForFloor(startFloor);
+  const targetRooms =
+    allFloorsRoomsMap?.[targetFloor] || generateDefaultRoomsForFloor(targetFloor);
 
   // 3. Resolve start & target entities
   const startObj = findOrSynthesizeEntity(startEntityId, startFloor, pool);
@@ -742,8 +857,8 @@ export function calculateMultiFloorRoute(
   }
 
   const activeFloorRoutePoints =
-    floorSegments[startFloor]?.routePoints ||
     floorSegments[targetFloor]?.routePoints ||
+    floorSegments[startFloor]?.routePoints ||
     [];
   const estimatedTimeText = formatTimeEstimate(totalSeconds);
 

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useRooms } from '../context/RoomsContext';
 import { AdminLoginModal } from '../components/auth/AdminLoginModal';
+import { resolveRoomFloor } from '../lib/pathfinding';
 import {
   Compass,
   MapPin,
@@ -50,23 +51,8 @@ export const RouteSelectionPage: React.FC = () => {
       return;
     }
 
-    const resolveFloor = (code: string): number => {
-      const match = allBuildingDestinations.find(
-        (r) => r.id.toLowerCase() === code.toLowerCase()
-      );
-      if (match?.floor) return match.floor;
-
-      if (/^0\d{3}$/.test(code) || /^[4-8]\d{2}$/.test(code)) return 1; // Ground Floor Mech (0481, 481, 0851)
-      if (/^1\d{3}$/.test(code)) return 2; // 1st Floor IT (1581, 1611, 1411)
-      if (/^2\d{3}$/.test(code) || code.startsWith('356') || /^3\d{3}$/.test(code)) return 3; // 3rd Floor AIDS/ECE (2411, 3561)
-      if (/^4\d{3}$/.test(code)) return 4; // 4th Floor Chemical (4331, 4611)
-      if (/^5\d{3}$/.test(code)) return 5; // 5th Floor Biomedical (5371, 5581)
-      if (/^6\d{3}$/.test(code)) return 6; // 6th Floor MBA (6681, 6411, 6853)
-      return 6;
-    };
-
-    const sFloor = resolveFloor(trimmedStart);
-    const tFloor = resolveFloor(trimmedTarget);
+    const sFloor = resolveRoomFloor(trimmedStart, 6, allBuildingDestinations);
+    const tFloor = resolveRoomFloor(trimmedTarget, sFloor, allBuildingDestinations);
 
     // Navigate to Map with just the room numbers
     navigate(

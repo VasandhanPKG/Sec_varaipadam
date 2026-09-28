@@ -275,54 +275,29 @@ export function BlueprintCanvas({
 
   return (
     <main className="flex-1 relative flex flex-col h-full select-none overflow-hidden spaceplanner-grid-bg">
-      {/* 1. LEVEL SELECTOR PILL BAR */}
-      <div className="absolute top-3 left-3 right-3 sm:right-auto sm:top-5 sm:left-5 z-20 flex md:flex-col gap-1.5 sm:gap-2 bg-[#fcfaf6]/95 backdrop-blur-md rounded-2xl p-1.5 sm:p-2 shadow-md shadow-[#11202f]/5 border border-[#ded4c0] overflow-x-auto pointer-events-auto max-w-full">
-        {[1, 2, 3, 4, 5, 6].map((fl) => {
-          const isActive = currentFloor === fl;
-          return (
-            <button
-              key={fl}
-              onClick={() => setCurrentFloor(fl)}
-              className={`flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
-                isActive
-                  ? 'bg-[#1e354d] text-white shadow-md shadow-[#1e354d]/25 scale-[1.02]'
-                  : 'text-[#334155] hover:bg-[#ede5d6] hover:text-[#11202f]'
-              }`}
-            >
-              {fl === 1 ? (
-                <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              ) : (
-                <Building className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              )}
-              <span>Level 0{fl}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 2. BOTTOM FLOATING CARD: SEARCHABLE INPUTS + AUTO-SUGGESTIONS + DIRECTIONS */}
-      <div className="absolute bottom-2 sm:bottom-3 left-2 right-2 sm:left-5 sm:right-5 z-30 pointer-events-auto max-w-4xl mx-auto flex flex-col bg-[#fcfaf6]/95 backdrop-blur-md rounded-2xl shadow-xl shadow-[#11202f]/10 border border-[#ded4c0] transition-all">
+      {/* 1. BOTTOM FLOATING CARD: ULTRA-FAST SEARCHABLE INPUTS + AUTO-SUGGESTIONS + DIRECTIONS */}
+      <div className="absolute bottom-2 sm:bottom-4 left-2 right-2 sm:left-6 sm:right-6 z-30 pointer-events-auto max-w-3xl mx-auto flex flex-col bg-[#fcfaf6]/95 backdrop-blur-md rounded-2xl shadow-2xl shadow-[#11202f]/15 border border-[#ded4c0] transition-all">
         {/* Active Route Directions Header & Scrollable Steps */}
         {activeRoute && (
-          <div className="border-b border-[#ded4c0] p-3 sm:p-4 bg-[#faf8f3]/90">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
+          <div className="border-b border-[#ded4c0] p-2.5 sm:p-3.5 bg-[#faf8f3]/95">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
                 <div className="w-7 h-7 rounded-xl bg-[#1e354d] text-white flex items-center justify-center shrink-0 shadow-sm">
                   <Navigation className="w-4 h-4" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-serif font-bold text-[#11202f] text-xs sm:text-sm">
-                      Route to {activeRoute.targetEntity.name || `Room ${activeRoute.targetEntity.id}`}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h4 className="font-serif font-bold text-[#11202f] text-xs sm:text-sm truncate">
+                      To {activeRoute.targetEntity.name || `Room ${activeRoute.targetEntity.id}`}
                     </h4>
                     {activeRoute.isMultiFloor && (
-                      <span className="text-[10px] font-mono font-bold bg-[#dbe4eb] text-[#1e354d] px-2 py-0.5 rounded-full border border-[#cad7e2]">
-                        Level 0{activeRoute.startFloor} ➔ Level 0{activeRoute.targetFloor}
+                      <span className="text-[9.5px] font-mono font-bold bg-[#dbe4eb] text-[#1e354d] px-1.5 py-0.2 rounded-full border border-[#cad7e2] shrink-0">
+                        L0{activeRoute.startFloor} ➔ L0{activeRoute.targetFloor}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-[11px] text-[#64748b] mt-0.5">
-                    <span className="flex items-center gap-1 font-medium text-[#1e354d]">
+                  <div className="flex items-center gap-1.5 text-[10.5px] text-[#64748b] mt-0.5">
+                    <span className="flex items-center gap-1 font-semibold text-[#1e354d]">
                       <Clock className="w-3 h-3" />
                       {activeRoute.estimatedTimeText}
                     </span>
@@ -332,22 +307,22 @@ export function BlueprintCanvas({
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   onClick={() => setIsDirectionsExpanded((prev) => !prev)}
-                  className="p-1.5 rounded-lg text-[#64748b] hover:bg-[#eae3d2] transition text-xs font-semibold flex items-center gap-1"
+                  className="px-2 py-1 rounded-lg text-[#64748b] hover:bg-[#eae3d2] transition text-xs font-semibold flex items-center gap-1"
                   title="Toggle directions view"
                 >
-                  <span className="hidden sm:inline">{isDirectionsExpanded ? 'Hide' : 'Show'} Steps</span>
+                  <span className="text-[11px] font-bold">{isDirectionsExpanded ? 'Hide' : 'Show'}</span>
                   {isDirectionsExpanded ? (
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-3.5 h-3.5" />
                   ) : (
-                    <ChevronUp className="w-4 h-4" />
+                    <ChevronUp className="w-3.5 h-3.5" />
                   )}
                 </button>
                 <button
                   onClick={onClearRoute}
-                  className="p-1.5 rounded-lg text-[#64748b] hover:text-rose-600 hover:bg-rose-50 transition"
+                  className="p-1 rounded-lg text-[#64748b] hover:text-rose-600 hover:bg-rose-50 transition"
                   title="Clear route"
                 >
                   <X className="w-4 h-4" />
@@ -357,69 +332,34 @@ export function BlueprintCanvas({
 
             {/* Multi-Floor Dedicated Leg Buttons */}
             {activeRoute.isMultiFloor && (
-              <div className="mt-2.5 pt-2.5 border-t border-[#ded4c0]/80">
-                <div className="flex items-center justify-between mb-1.5 px-0.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748b] flex items-center gap-1">
-                    <Layers className="w-3.5 h-3.5 text-[#1e354d]" />
-                    <span>Select Journey Leg to View Path:</span>
-                  </span>
-                  <span className="text-[10px] font-medium text-[#8a99a8]">
-                    Currently viewing: <strong className="text-[#1e354d]">Floor {currentFloor}</strong>
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {/* Leg 1 Button: Floor X Room -> Stairs/Lift */}
+              <div className="mt-2 pt-2 border-t border-[#ded4c0]/80">
+                <div className="grid grid-cols-2 gap-1.5">
+                  {/* Leg 1 Button */}
                   <button
                     type="button"
                     onClick={() => setCurrentFloor(activeRoute.startFloor)}
-                    className={`px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
+                    className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center justify-between border ${
                       currentFloor === activeRoute.startFloor
-                        ? 'bg-[#1e354d] text-white border-[#1e354d] shadow-md shadow-[#1e354d]/25 scale-[1.01]'
+                        ? 'bg-[#1e354d] text-white border-[#1e354d] shadow-sm'
                         : 'bg-white hover:bg-[#ede5d6] text-[#1e354d] border-[#ded4c0]'
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-mono font-bold shrink-0 ${
-                        currentFloor === activeRoute.startFloor ? 'bg-white/20 text-white' : 'bg-[#dbe4eb] text-[#1e354d]'
-                      }`}>
-                        1
-                      </span>
-                      <span className="truncate text-left">
-                        Floor {activeRoute.startFloor} ({activeRoute.startEntity.name || activeRoute.startEntity.id}) ➔ Staircase/Lift
-                      </span>
-                    </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold shrink-0 ml-1.5 ${
-                      currentFloor === activeRoute.startFloor ? 'bg-white/25 text-white' : 'bg-[#dbe4eb] text-[#1e354d]'
-                    }`}>
-                      Level 0{activeRoute.startFloor}
-                    </span>
+                    <span className="truncate">1. Floor {activeRoute.startFloor} ➔ Lift</span>
+                    <span className="font-mono text-[10px] ml-1 shrink-0">L0{activeRoute.startFloor}</span>
                   </button>
 
-                  {/* Leg 2 Button: Stairs/Lift -> Floor Y Room */}
+                  {/* Leg 2 Button */}
                   <button
                     type="button"
                     onClick={() => setCurrentFloor(activeRoute.targetFloor)}
-                    className={`px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-between border ${
+                    className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center justify-between border ${
                       currentFloor === activeRoute.targetFloor
-                        ? 'bg-[#1e354d] text-white border-[#1e354d] shadow-md shadow-[#1e354d]/25 scale-[1.01]'
+                        ? 'bg-[#1e354d] text-white border-[#1e354d] shadow-sm'
                         : 'bg-white hover:bg-[#ede5d6] text-[#1e354d] border-[#ded4c0]'
                     }`}
                   >
-                    <div className="flex items-center gap-2 truncate">
-                      <span className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-mono font-bold shrink-0 ${
-                        currentFloor === activeRoute.targetFloor ? 'bg-white/20 text-white' : 'bg-[#dbe4eb] text-[#1e354d]'
-                      }`}>
-                        2
-                      </span>
-                      <span className="truncate text-left">
-                        Staircase/Lift ➔ Floor {activeRoute.targetFloor} ({activeRoute.targetEntity.name || activeRoute.targetEntity.id})
-                      </span>
-                    </div>
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold shrink-0 ml-1.5 ${
-                      currentFloor === activeRoute.targetFloor ? 'bg-white/25 text-white' : 'bg-[#dbe4eb] text-[#1e354d]'
-                    }`}>
-                      Level 0{activeRoute.targetFloor}
-                    </span>
+                    <span className="truncate">2. Lift ➔ Floor {activeRoute.targetFloor}</span>
+                    <span className="font-mono text-[10px] ml-1 shrink-0">L0{activeRoute.targetFloor}</span>
                   </button>
                 </div>
               </div>
@@ -427,18 +367,18 @@ export function BlueprintCanvas({
 
             {/* Scrollable Step-by-Step Instructions */}
             {isDirectionsExpanded && activeRoute.steps && activeRoute.steps.length > 0 && (
-              <div className="mt-2.5 max-h-32 sm:max-h-40 overflow-y-auto space-y-1.5 pr-1 text-xs">
+              <div className="mt-2 max-h-28 sm:max-h-36 overflow-y-auto space-y-1 pr-1 text-xs no-scrollbar">
                 {activeRoute.steps.map((step, idx) => (
                   <div
                     key={idx}
-                    className={`flex items-start gap-2.5 p-2 rounded-xl border transition ${
+                    className={`flex items-start gap-2 p-1.5 rounded-xl border transition ${
                       step.isFloorChange
                         ? 'bg-[#fffbeb] border-amber-200 text-amber-950 font-medium'
-                        : 'bg-white border-[#ded4c0] shadow-xs hover:border-[#1e354d]'
+                        : 'bg-white border-[#ded4c0] shadow-xs'
                     }`}
                   >
                     <div
-                      className={`w-6 h-6 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${
+                      className={`w-5 h-5 rounded-lg border flex items-center justify-center shrink-0 mt-0.5 ${
                         step.isFloorChange
                           ? 'bg-amber-100 border-amber-300'
                           : 'bg-[#faf8f3] border-[#ded4c0]'
@@ -448,20 +388,19 @@ export function BlueprintCanvas({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="font-semibold text-[#11202f] leading-tight">
+                        <p className="font-semibold text-[#11202f] text-[11px] leading-tight">
                           {step.title}
                         </p>
                         {step.floor && (
                           <button
                             onClick={() => setCurrentFloor(step.floor!)}
-                            className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#dbe4eb] hover:bg-[#cad7e2] text-[#1e354d] border border-[#cad7e2] ml-1"
-                            title={`Switch map view to Floor ${step.floor}`}
+                            className="text-[9px] font-mono font-bold px-1 py-0.2 rounded bg-[#dbe4eb] text-[#1e354d] border border-[#cad7e2] ml-1 shrink-0"
                           >
                             L0{step.floor}
                           </button>
                         )}
                       </div>
-                      <p className="text-[11px] text-[#64748b] mt-0.5">{step.desc}</p>
+                      <p className="text-[10px] text-[#64748b] mt-0.2 line-clamp-1">{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -470,167 +409,118 @@ export function BlueprintCanvas({
           </div>
         )}
 
-        {/* Start / Destination Searchable Input Form with Live Suggestions */}
-        <div className="p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5">
-          <div className="shrink-0 hidden md:block max-w-[140px]">
-            <span className="font-mono text-[9px] font-bold tracking-wider text-[#1e354d] uppercase bg-[#dbe4eb] px-2 py-0.5 rounded border border-[#cad7e2]">
-              PLANNERS
-            </span>
-            <h5 className="font-serif font-black text-[#11202f] text-xs sm:text-sm mt-1 leading-tight">Find Room</h5>
-          </div>
+        {/* Fast Search Input with Autocomplete Dropdown */}
+        <div className="p-2 sm:p-3">
+          <div className="flex items-center gap-2">
+            {/* Destination Search Box */}
+            <div ref={destContainerRef} className="relative flex-1 min-w-0">
+              <div className="flex items-center gap-2 bg-white border border-[#ded4c0] focus-within:border-[#1e354d] focus-within:ring-2 focus-within:ring-[#1e354d]/10 rounded-xl px-2.5 sm:px-3 py-2 transition shadow-sm">
+                <Flag className="w-4 h-4 text-blue-600 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <input
+                    type="text"
+                    value={destInputText}
+                    onFocus={() => setIsDestOpen(true)}
+                    onChange={(e) => {
+                      setDestInputText(e.target.value);
+                      setIsDestOpen(true);
+                    }}
+                    placeholder="Type class number (e.g. 6853, 6411, 4151, Lab...)"
+                    className="w-full bg-transparent text-xs sm:text-sm font-bold text-[#11202f] focus:outline-none placeholder-[#8a99a8] truncate"
+                  />
+                </div>
+                {destInputText && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDestInputText('');
+                      setIsDestOpen(true);
+                    }}
+                    className="p-1 text-[#8a99a8] hover:text-[#11202f]"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
 
-          {/* Start Searchable Input */}
-          <div ref={startContainerRef} className="relative flex-1 min-w-0">
-            <div className="flex items-center gap-2 bg-white border border-[#ded4c0] focus-within:border-[#1e354d] focus-within:ring-2 focus-within:ring-[#1e354d]/10 rounded-xl px-3 py-1.5 transition shadow-xs">
-              <div className="w-5 h-5 rounded-full bg-[#1e354d] text-[#f7f4ed] font-bold text-[10px] flex items-center justify-center shrink-0">
-                1
-              </div>
-              <div className="flex-1 min-w-0">
-                <span className="text-[9px] font-bold text-[#8a99a8] block uppercase leading-none mb-0.5">
-                  Start Location
-                </span>
-                <input
-                  type="text"
-                  value={startInputText}
-                  onFocus={() => setIsStartOpen(true)}
-                  onChange={(e) => {
-                    setStartInputText(e.target.value);
-                    setIsStartOpen(true);
-                  }}
-                  placeholder="Type room, lab, lift..."
-                  className="w-full bg-transparent text-xs font-bold text-[#11202f] focus:outline-none placeholder-[#8a99a8] truncate"
-                />
-              </div>
-              {startInputText && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStartInputText('');
-                    setIsStartOpen(true);
-                  }}
-                  className="text-[#8a99a8] hover:text-[#11202f]"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+              {/* Destination Suggestions Dropdown */}
+              {isDestOpen && (
+                <div className="absolute bottom-full left-0 right-0 mb-1.5 bg-white border border-[#ded4c0] rounded-2xl shadow-2xl max-h-56 overflow-y-auto z-50 p-1.5 divide-y divide-[#faf8f3]">
+                  {destSuggestions.length === 0 ? (
+                    <div className="p-3 text-center text-xs text-[#64748b] font-medium">
+                      No matching class or room found
+                    </div>
+                  ) : (
+                    destSuggestions.map((item) => (
+                      <div
+                        key={`dest_sugg_${item.id}`}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelectDestItem(item);
+                          // Calculate route immediately upon selection
+                          let sFloor = currentFloor;
+                          let tFloor = item.floor || currentFloor;
+                          if (onCalculateRoute) {
+                            onCalculateRoute(demoStartId || 'lift_sw', item.id, sFloor, tFloor);
+                          }
+                        }}
+                        className="px-3 py-2 rounded-xl hover:bg-[#f3ede1] cursor-pointer flex items-center justify-between transition text-xs"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <div className="font-mono font-bold text-[#1e354d] flex items-center gap-1.5">
+                            <span>{item.id}</span>
+                            <span className="px-1.5 py-0.2 bg-[#dbe4eb] text-[#1e354d] rounded text-[9px] font-sans font-medium">
+                              L0{item.floor}
+                            </span>
+                          </div>
+                          <div className="text-[#11202f] font-medium truncate mt-0.5">{item.name}</div>
+                        </div>
+                        <span className="text-[9px] font-bold text-[#1e354d] uppercase bg-[#dbe4eb] px-2 py-0.5 rounded border border-[#cad7e2] shrink-0">
+                          {item.type}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
               )}
             </div>
 
-            {/* Start Suggestions Dropdown */}
-            {isStartOpen && (
-              <div className="absolute bottom-full left-0 right-0 mb-1.5 bg-white border border-[#ded4c0] rounded-2xl shadow-2xl max-h-56 overflow-y-auto z-50 p-1.5 divide-y divide-[#faf8f3]">
-                {startSuggestions.length === 0 ? (
-                  <div className="p-3 text-center text-xs text-[#64748b] font-medium">
-                    No matching location found
-                  </div>
-                ) : (
-                  startSuggestions.map((item) => (
-                    <div
-                      key={`start_sugg_${item.id}`}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelectStartItem(item);
-                      }}
-                      className="px-3 py-2 rounded-xl hover:bg-[#f3ede1] cursor-pointer flex items-center justify-between transition text-xs"
-                    >
-                      <div className="min-w-0 pr-2">
-                        <div className="font-mono font-bold text-[#1e354d] flex items-center gap-1.5">
-                          <span>{item.id}</span>
-                          <span className="px-1.5 py-0.2 bg-[#dbe4eb] text-[#1e354d] rounded text-[9px] font-sans font-medium">
-                            L0{item.floor}
-                          </span>
-                        </div>
-                        <div className="text-[#11202f] font-medium truncate mt-0.5">{item.name}</div>
-                      </div>
-                      <span className="text-[9px] font-bold text-[#1e354d] uppercase bg-[#dbe4eb] px-2 py-0.5 rounded border border-[#cad7e2] shrink-0">
-                        {item.type}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+            {/* Direct Route Go Button */}
+            <button
+              onClick={handleTriggerRoute}
+              className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#1e354d] hover:bg-[#162a3f] active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-[#1e354d]/20 shrink-0 transition"
+              title="Calculate route"
+            >
+              <Send className="w-3.5 h-3.5 text-[#ded4c0]" />
+              <span className="hidden sm:inline">Navigate</span>
+            </button>
           </div>
 
-          <ArrowRight className="w-4 h-4 text-[#ded4c0] shrink-0 hidden sm:block" />
-
-          {/* Destination Searchable Input */}
-          <div ref={destContainerRef} className="relative flex-1 min-w-0">
-            <div className="flex items-center gap-2 bg-white border border-[#ded4c0] focus-within:border-[#1e354d] focus-within:ring-2 focus-within:ring-[#1e354d]/10 rounded-xl px-3 py-1.5 transition shadow-xs">
-              <Flag className="w-4 h-4 text-[#1e354d] shrink-0" />
-              <div className="flex-1 min-w-0">
-                <span className="text-[9px] font-bold text-[#8a99a8] block uppercase leading-none mb-0.5">
-                  Destination
-                </span>
-                <input
-                  type="text"
-                  value={destInputText}
-                  onFocus={() => setIsDestOpen(true)}
-                  onChange={(e) => {
-                    setDestInputText(e.target.value);
-                    setIsDestOpen(true);
-                  }}
-                  placeholder="Type room, lab, facility..."
-                  className="w-full bg-transparent text-xs font-bold text-[#11202f] focus:outline-none placeholder-[#8a99a8] truncate"
-                />
-              </div>
-              {destInputText && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDestInputText('');
-                    setIsDestOpen(true);
-                  }}
-                  className="text-[#8a99a8] hover:text-[#11202f]"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Destination Suggestions Dropdown */}
-            {isDestOpen && (
-              <div className="absolute bottom-full left-0 right-0 mb-1.5 bg-white border border-[#ded4c0] rounded-2xl shadow-2xl max-h-56 overflow-y-auto z-50 p-1.5 divide-y divide-[#faf8f3]">
-                {destSuggestions.length === 0 ? (
-                  <div className="p-3 text-center text-xs text-[#64748b] font-medium">
-                    No matching location found
-                  </div>
-                ) : (
-                  destSuggestions.map((item) => (
-                    <div
-                      key={`dest_sugg_${item.id}`}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        handleSelectDestItem(item);
-                      }}
-                      className="px-3 py-2 rounded-xl hover:bg-[#f3ede1] cursor-pointer flex items-center justify-between transition text-xs"
-                    >
-                      <div className="min-w-0 pr-2">
-                        <div className="font-mono font-bold text-[#1e354d] flex items-center gap-1.5">
-                          <span>{item.id}</span>
-                          <span className="px-1.5 py-0.2 bg-[#dbe4eb] text-[#1e354d] rounded text-[9px] font-sans font-medium">
-                            L0{item.floor}
-                          </span>
-                        </div>
-                        <div className="text-[#11202f] font-medium truncate mt-0.5">{item.name}</div>
-                      </div>
-                      <span className="text-[9px] font-bold text-[#1e354d] uppercase bg-[#dbe4eb] px-2 py-0.5 rounded border border-[#cad7e2] shrink-0">
-                        {item.type}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+          {/* Quick-Pick Destination Category Chips for Fast 1-Tap Search */}
+          <div className="flex items-center gap-1.5 mt-2 overflow-x-auto no-scrollbar py-0.5">
+            {[
+              { label: 'Auditorium', id: `${currentFloor}151` },
+              { label: 'Communication Lab', id: `${currentFloor}581` },
+              { label: 'Electronics Lab', id: `${currentFloor}582` },
+              { label: 'SW Lift', id: 'lift_sw' },
+              { label: 'Restroom', id: `${currentFloor}511` },
+            ].map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => {
+                  setDemoTargetId(chip.id);
+                  setDestInputText(chip.label);
+                  if (onCalculateRoute) {
+                    onCalculateRoute('lift_sw', chip.id, currentFloor, currentFloor);
+                  }
+                }}
+                className="px-2.5 py-1 rounded-lg bg-[#faf8f3] hover:bg-[#ede5d6] text-[#1e354d] border border-[#ded4c0] text-[10.5px] font-semibold whitespace-nowrap shrink-0 transition shadow-2xs"
+              >
+                {chip.label}
+              </button>
+            ))}
           </div>
-
-          {/* Show Route Button */}
-          <button
-            onClick={handleTriggerRoute}
-            className="px-4 py-2.5 rounded-xl bg-[#1e354d] hover:bg-[#162a3f] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-[#1e354d]/20 shrink-0 transition"
-          >
-            <Send className="w-3.5 h-3.5 text-[#ded4c0]" />
-            <span>Show Route</span>
-          </button>
         </div>
       </div>
 

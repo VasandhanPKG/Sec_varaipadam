@@ -194,45 +194,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           )}
 
-          {/* TAB 1: ADMIN LOGIN */}
+          {/* TAB 1: ADMIN LOGIN - PASSWORD ONLY */}
           {activeTab === 'admin' && (
-            <form onSubmit={handleAdminSubmit} className="space-y-3.5 pt-1">
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Admin Name / Identifier (Optional)
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
-                  <input
-                    type="text"
-                    value={adminUsername}
-                    onChange={(e) => setAdminUsername(e.target.value)}
-                    placeholder="e.g. Campus Administrator"
-                    className="w-full pl-10 pr-3 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
-                  />
-                </div>
-              </div>
+            <form onSubmit={handleAdminSubmit} className="space-y-4 pt-1">
+              <p className="text-xs text-slate-400">
+                Authorized administrators only. Enter master password to access room controls and blueprint editor.
+              </p>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Admin Password <span className="text-amber-400">*</span>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
+                  <span>Admin Password</span>
+                  <span className="text-[10px] font-mono text-amber-400">Required</span>
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
+                  <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
                   <input
                     type="password"
+                    autoFocus
                     required
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
-                    placeholder="Enter admin password"
-                    className="w-full pl-10 pr-3 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition"
+                    placeholder="Enter administrator password..."
+                    className="w-full pl-10 pr-3 py-2.5 bg-slate-800/90 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition shadow-inner"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-amber-600/30 transition flex items-center justify-center gap-2 active:scale-[0.98]"
+                className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold rounded-xl text-xs shadow-lg shadow-amber-600/30 transition flex items-center justify-center gap-2 active:scale-[0.98]"
               >
                 <KeyRound className="w-4 h-4" />
                 <span>Verify & Enter Admin Studio</span>

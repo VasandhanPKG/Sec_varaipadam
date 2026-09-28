@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useRooms } from '../../context/RoomsContext';
 import { useAuth } from '../../context/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
+import { AdminLoginModal } from '../auth/AdminLoginModal';
 import {
   Compass,
   Layers,
@@ -28,15 +29,15 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
   const { currentFloor, setCurrentFloor, floorsMeta } = useRooms();
   const { user, logout, isAdmin } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'student' | 'admin'>('student');
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  const isHome = location.pathname === '/';
+  const isMapPage = location.pathname === '/map' || location.pathname === '/';
   const isAdminPage = location.pathname === '/admin';
 
   const openAdminLogin = () => {
-    setAuthModalTab('admin');
-    setShowAuthModal(true);
+    setShowAdminModal(true);
   };
 
   const openStudentLogin = () => {
@@ -95,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
           </div>
 
           {/* 2D / 3D View Switcher */}
-          {isHome && onViewModeChange && (
+          {isMapPage && onViewModeChange && (
             <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-0.5 sm:p-1 shadow-inner shrink-0">
               <button
                 onClick={() => onViewModeChange('2d')}
@@ -127,14 +128,14 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
 
         {/* Right: Admin Link & Auth */}
         <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
-          {/* Admin Studio Link - STRICTLY HIDDEN FOR STUDENTS & GUESTS */}
-          {isAdmin && (
+          {/* Admin Studio Link if already logged in as Admin */}
+          {isAdmin ? (
             <Link
-              to={isAdminPage ? '/' : '/admin'}
+              to={isAdminPage ? '/map' : '/admin'}
               className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition shadow-sm ${
                 isAdminPage
                   ? 'bg-blue-600 text-white border-blue-500 shadow-blue-600/20'
-                  : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20 hover:text-white'
+                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25 hover:text-white'
               }`}
             >
               {isAdminPage ? (
@@ -149,6 +150,15 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
                 </>
               )}
             </Link>
+          ) : (
+            <button
+              onClick={openAdminLogin}
+              className="flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 font-semibold text-xs rounded-xl transition active:scale-95"
+              title="Admin Login (Password only)"
+            >
+              <Shield className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden xs:inline">Admin</span>
+            </button>
           )}
 
           {/* User Auth Dropdown */}
@@ -232,6 +242,12 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         defaultTab={authModalTab}
+      />
+
+      <AdminLoginModal
+        isOpen={showAdminModal}
+        onClose={() => setShowAdminModal(false)}
+        redirectToAdmin={true}
       />
     </>
   );

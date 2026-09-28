@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '../components/ui/Header';
 import { BlueprintCanvas } from '../components/2d/BlueprintCanvas';
 import { Building3DScene } from '../components/3d/Building3DScene';
@@ -7,6 +8,7 @@ import { calculateMultiFloorRoute } from '../lib/pathfinding';
 import { useRooms } from '../context/RoomsContext';
 
 export function HomePage() {
+  const [searchParams] = useSearchParams();
   const {
     allBuildingDestinations,
     rooms,
@@ -67,22 +69,35 @@ export function HomePage() {
     setSelectedEntity(null);
   };
 
-  // Initial demo route from SW Lift to default studio/room on mount
+  // Handle initial route either from URL query params (e.g. ?room=6411&floor=6) or default 6853
   useEffect(() => {
-    const defaultTarget = rooms.find((r) => r.id === '6853') || rooms[0];
-    if (defaultTarget) {
-      setSelectedEntity(defaultTarget);
+    const paramRoom = searchParams.get('room');
+    const paramFloor = searchParams.get('floor');
+
+    let targetFloor = paramFloor ? parseInt(paramFloor, 10) : currentFloor;
+    let targetRoomId = paramRoom || '6853';
+
+    if (paramFloor && !isNaN(targetFloor) && targetFloor >= 1 && targetFloor <= 6) {
+      setCurrentFloor(targetFloor);
+    } else if (paramRoom && /^[1-6]\d{3}$/.test(paramRoom)) {
+      targetFloor = parseInt(paramRoom[0], 10);
+      setCurrentFloor(targetFloor);
+    }
+
+    const target = allBuildingDestinations.find((r) => r.id === targetRoomId) || rooms[0];
+    if (target) {
+      setSelectedEntity(target);
       const res = calculateMultiFloorRoute(
         'lift_sw',
-        defaultTarget.id,
-        currentFloor,
-        defaultTarget.floor || currentFloor,
+        target.id,
+        targetFloor,
+        target.floor || targetFloor,
         allFloorsRooms,
         allBuildingDestinations
       );
       if (res) setActiveRoute(res);
     }
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-50 text-slate-900">

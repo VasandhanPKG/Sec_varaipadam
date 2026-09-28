@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { RoomsProvider } from './context/RoomsContext';
+import { LandingPage } from './pages/LandingPage';
 import { HomePage } from './pages/HomePage';
 import { AdminPage } from './pages/AdminPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -35,8 +36,8 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
           <h2 className="text-xl font-bold text-white">Administrator Access Required</h2>
           <p className="text-xs text-slate-400 mt-1">
             {user
-              ? `You are currently signed in as a ${user.role}. This section is restricted to campus administrators.`
-              : 'This section is restricted to authorized campus administrators.'}
+              ? `You are currently signed in as a ${user.role}. Enter admin password to proceed.`
+              : 'Enter the administrator password to unlock campus management.'}
           </p>
         </div>
 
@@ -53,6 +54,7 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
             </label>
             <input
               type="password"
+              autoFocus
               required
               value={adminPass}
               onChange={(e) => setAdminPass(e.target.value)}
@@ -70,13 +72,20 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
           </button>
         </form>
 
-        <div className="pt-2 border-t border-slate-800 text-center">
+        <div className="pt-2 border-t border-slate-800 text-center flex justify-between text-xs">
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition font-medium"
+            className="inline-flex items-center gap-1.5 text-slate-400 hover:text-slate-200 transition font-medium"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Campus Map</span>
+            <span>Home</span>
+          </Link>
+          <Link
+            to="/map"
+            className="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition font-medium"
+          >
+            <span>Campus Map</span>
+            <ArrowLeft className="w-3.5 h-3.5 rotate-180" />
           </Link>
         </div>
       </div>
@@ -89,7 +98,8 @@ export function App() {
     <AuthProvider>
       <RoomsProvider>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/map" element={<HomePage />} />
           <Route
             path="/admin"
             element={

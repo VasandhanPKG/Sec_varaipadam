@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useRooms } from '../../context/RoomsContext';
 import { useAuth } from '../../context/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { AdminLoginModal } from '../auth/AdminLoginModal';
@@ -26,7 +25,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) => {
   const location = useLocation();
-  const { currentFloor, setCurrentFloor, floorsMeta } = useRooms();
   const { user, logout, isAdmin } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
@@ -72,59 +70,35 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
           </Link>
         </div>
 
-        {/* Center: Floor Selector & View Toggle */}
-        <div className="flex items-center space-x-1 sm:space-x-2 overflow-x-auto py-0.5 no-scrollbar">
-          {/* Floor Switcher */}
+        {/* Center: 2D / 3D View Switcher */}
+        {isMapPage && onViewModeChange && (
           <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-0.5 sm:p-1 shadow-inner shrink-0">
-            {[1, 2, 3, 4, 5, 6].map((fl) => {
-              const active = currentFloor === fl;
-              return (
-                <button
-                  key={fl}
-                  onClick={() => setCurrentFloor(fl)}
-                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-all ${
-                    active
-                      ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
-                  }`}
-                  title={floorsMeta[fl]?.name || `Floor ${fl}`}
-                >
-                  L{fl}
-                </button>
-              );
-            })}
+            <button
+              onClick={() => onViewModeChange('2d')}
+              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition ${
+                viewMode === '2d'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+              title="2D Blueprint View"
+            >
+              <MapIcon className="w-3.5 h-3.5" />
+              <span>2D Blueprint</span>
+            </button>
+            <button
+              onClick={() => onViewModeChange('3d')}
+              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition ${
+                viewMode === '3d'
+                  ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}
+              title="3D Building Twin"
+            >
+              <Box className="w-3.5 h-3.5" />
+              <span>3D Twin</span>
+            </button>
           </div>
-
-          {/* 2D / 3D View Switcher */}
-          {isMapPage && onViewModeChange && (
-            <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-0.5 sm:p-1 shadow-inner shrink-0">
-              <button
-                onClick={() => onViewModeChange('2d')}
-                className={`flex items-center space-x-1 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-semibold rounded-lg transition ${
-                  viewMode === '2d'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-                title="2D Blueprint View"
-              >
-                <MapIcon className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">2D</span>
-              </button>
-              <button
-                onClick={() => onViewModeChange('3d')}
-                className={`flex items-center space-x-1 px-2 sm:px-2.5 py-0.5 sm:py-1 text-[11px] sm:text-xs font-semibold rounded-lg transition ${
-                  viewMode === '3d'
-                    ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-                title="3D Building Twin"
-              >
-                <Box className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">3D</span>
-              </button>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Right: Admin Link & Auth */}
         <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">

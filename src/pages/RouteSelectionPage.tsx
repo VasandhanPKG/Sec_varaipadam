@@ -102,7 +102,7 @@ export const RouteSelectionPage: React.FC = () => {
               </span>
             </div>
             <p className="text-[10px] text-slate-400 hidden sm:block">
-              Saveetha Engineering College • Smart Indoor Navigation
+              Saveetha Engineering College • Auditorium Block Indoor Navigation
             </p>
           </div>
         </Link>

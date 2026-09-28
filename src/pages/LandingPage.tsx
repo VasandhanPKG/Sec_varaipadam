@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => {
               </span>
             </div>
             <p className="text-[10px] text-slate-400">
-              Saveetha Engineering College • Smart Campus Indoor Navigation
+              Saveetha Engineering College • Auditorium Block Indoor Navigation
             </p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export const LandingPage: React.FC = () => {
               SEC வரைபடம்
             </h1>
             <p className="text-xs text-amber-300/80 font-mono mt-0.5">
-              SAVEETHA ENGINEERING COLLEGE
+              AUDITORIUM BLOCK • SAVEETHA ENGINEERING COLLEGE
             </p>
           </div>
 

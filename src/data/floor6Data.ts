@@ -21,7 +21,7 @@ export const ROOMS_DATA: RoomItem[] = [
   { id: "6453", std: "6453", name: "Classroom 6453", type: "classroom", capacity: 50, row: 4, col: 5, bay: 3, x: 502, y: 645, w: 56, h: 60, doorX: 530, doorY: 620, desc: "Executive hall with personal power modules." },
   { id: "6454", std: "6454", name: "Classroom 6454", type: "classroom", capacity: 50, row: 4, col: 5, bay: 4, x: 562, y: 645, w: 56, h: 60, doorX: 590, doorY: 620, desc: "Central lecture room with motorized curtains." },
   // Row 4 Col 7 (6471)
-  { id: "6471", std: "6471", name: "Classroom 6471", type: "classroom", capacity: 40, row: 4, col: 7, bay: 1, x: 665, y: 645, w: 75, h: 60, doorX: 655, doorY: 620, desc: "MBA Classroom 6471." },
+  { id: "6471", std: "6471", name: "Classroom 6471", type: "classroom", capacity: 40, row: 4, col: 7, bay: 1, x: 665, y: 645, w: 58, h: 60, doorX: 655, doorY: 620, desc: "MBA Classroom 6471." },
   // Outer East Wing (Cols 8)
   { id: "6483", std: "6483", name: "Classroom 6483", type: "classroom", capacity: 40, row: 4, col: 8, bay: 3, x: 730, y: 645, w: 58, h: 60, doorX: 759, doorY: 620, desc: "Multi-modal display hall with lecture recording." },
   { id: "6482", std: "6482", name: "Classroom 6482", type: "classroom", capacity: 40, row: 4, col: 8, bay: 2, x: 792, y: 645, w: 58, h: 60, doorX: 821, doorY: 620, desc: "Standard presentation lecture room." },
@@ -51,9 +51,10 @@ export const ROOMS_DATA: RoomItem[] = [
   { id: "6612", std: "6612", name: "Classroom 6612", type: "classroom", capacity: 55, row: 6, col: 1, bay: 2, x: 155, y: 345, w: 60, h: 62, doorX: 185, doorY: 415, desc: "West Wing digital classroom." },
   { id: "6613", std: "6613", name: "Classroom 6613", type: "classroom", capacity: 55, row: 6, col: 1, bay: 3, x: 220, y: 345, w: 60, h: 62, doorX: 250, doorY: 415, desc: "West Wing multimedia theater." },
   // Center Bar (Cols 4,5,6)
-  { id: "6651", std: "6651", name: "Classroom 6651", type: "classroom", capacity: 58, row: 6, col: 5, bay: 1, x: 382, y: 345, w: 70, h: 62, doorX: 417, doorY: 415, desc: "Main concourse studio." },
-  { id: "6652", std: "6652", name: "Classroom 6652", type: "classroom", capacity: 58, row: 6, col: 5, bay: 2, x: 457, y: 345, w: 70, h: 62, doorX: 492, doorY: 415, desc: "Main concourse studio." },
-  { id: "6653", std: "6653", name: "Classroom 6653", type: "classroom", capacity: 58, row: 6, col: 5, bay: 3, x: 532, y: 345, w: 70, h: 62, doorX: 567, doorY: 415, desc: "Main concourse studio." },
+  { id: "6651", std: "6651", name: "Classroom 6651", type: "classroom", capacity: 58, row: 6, col: 5, bay: 1, x: 382, y: 345, w: 56, h: 62, doorX: 410, doorY: 415, desc: "Main concourse studio 6651." },
+  { id: "6652", std: "6652", name: "Classroom 6652", type: "classroom", capacity: 58, row: 6, col: 5, bay: 2, x: 442, y: 345, w: 56, h: 62, doorX: 470, doorY: 415, desc: "Main concourse studio 6652." },
+  { id: "6653", std: "6653", name: "Classroom 6653", type: "classroom", capacity: 58, row: 6, col: 5, bay: 3, x: 502, y: 345, w: 56, h: 62, doorX: 530, doorY: 415, desc: "Main concourse studio 6653." },
+  { id: "6654", std: "6654", name: "Classroom 6654", type: "classroom", capacity: 58, row: 6, col: 5, bay: 4, x: 562, y: 345, w: 56, h: 62, doorX: 590, doorY: 415, desc: "Main concourse studio 6654." },
   // Outer East (Cols 8)
   { id: "6683", std: "6683", name: "Classroom 6683", type: "classroom", capacity: 48, row: 6, col: 8, bay: 3, x: 720, y: 345, w: 60, h: 62, doorX: 750, doorY: 415, desc: "MBA Classroom 6683." },
   { id: "6682", std: "6682", name: "Classroom 6682", type: "classroom", capacity: 48, row: 6, col: 8, bay: 2, x: 785, y: 345, w: 60, h: 62, doorX: 815, doorY: 415, desc: "East Wing lecture studio." },
@@ -122,9 +123,9 @@ export const GRAPH_NODES: Record<string, GraphNode> = {
   // Row 6 Main Cross Gallery (y = 430)
   "r6_w_wing_end": { x: 120, y: 430, label: "West Wing Classrooms Corridor" },
   "r6_w_wing_junc":{ x: 202, y: 430, label: "West Wing Connector Junction" },
-  "r6_c4":         { x: 417, y: 430, label: "Studio 6651 Entry Gallery" },
+  "r6_c4":         { x: 410, y: 430, label: "Studio 6651 Entry Gallery" },
   "r6_c5_mid":     { x: 500, y: 430, label: "Central Cross Gallery Concourse" },
-  "r6_c6":         { x: 567, y: 430, label: "Studio 6653 Entry Gallery" },
+  "r6_c6":         { x: 590, y: 430, label: "Studio 6654 Entry Gallery" },
   "r6_e_wing_junc":{ x: 800, y: 430, label: "East Wing Connector Junction" },
   "r6_e_wing_end": { x: 880, y: 430, label: "East Wing Corridor" },
 

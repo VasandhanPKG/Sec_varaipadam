@@ -600,13 +600,13 @@ export function BlueprintCanvas({
               <text x="500" y="525" fill="#1e3a8a" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="extrabold">CENTER</text>
               <text x="500" y="540" fill="#1e3a8a" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="extrabold">VOID</text>
 
-              <rect x="376" y="645" width="248" height="235" rx="4" fill="#f4f9ff" stroke="#bfdbfe" strokeWidth="1.5" />
-              <use href="#treeSymbol" x="405" y="740" />
-              <use href="#treeSymbol" x="595" y="740" />
-              <text x="500" y="735" fill="#1e3a8a" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="extrabold" letterSpacing="0.6">
+              <rect x="376" y="712" width="248" height="168" rx="4" fill="#f4f9ff" stroke="#bfdbfe" strokeWidth="1.5" />
+              <use href="#treeSymbol" x="405" y="795" />
+              <use href="#treeSymbol" x="595" y="795" />
+              <text x="500" y="790" fill="#1e3a8a" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="extrabold" letterSpacing="0.6">
                 OPEN ATRIUM
               </text>
-              <text x="500" y="750" fill="#64748b" fontSize="9" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">
+              <text x="500" y="805" fill="#64748b" fontSize="9" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">
                 (SOUTH)
               </text>
             </g>

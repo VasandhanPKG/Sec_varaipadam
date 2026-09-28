@@ -19,7 +19,120 @@ GRAPH_CONNECTIONS.forEach(([u, v, w]) => {
   }
 });
 
-// Map room or vertical core to nearest corridor waypoint
+// Calculate distance between two points
+function dist2D(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+}
+
+// Get the exact door point of an entity
+export function getEntityDoor(entity: EntityItem): { x: number; y: number } {
+  if (entity.doorX !== undefined && entity.doorY !== undefined) {
+    return { x: entity.doorX, y: entity.doorY };
+  }
+  const x = 'x' in entity ? entity.x ?? 0 : 500;
+  const y = 'y' in entity ? entity.y ?? 0 : 500;
+  const w = 'w' in entity ? entity.w || 60 : 60;
+  const h = 'h' in entity ? entity.h || 60 : 60;
+  return { x: x + w / 2, y: y + h };
+}
+
+// Calculate the precise anchor point on the nearest circulation corridor
+export function getCorridorAnchorPoint(entity: EntityItem): { x: number; y: number; corridorAxis: 'x' | 'y' | 'none'; corridorValue: number } {
+  const door = getEntityDoor(entity);
+
+  if (entity.id === 'audi_portal' || entity.id.endsWith('151') || entity.id === '6151' || entity.id === '1151') {
+    return { x: 500, y: 900, corridorAxis: 'y', corridorValue: 900 };
+  }
+  if (entity.id === 'lift_sw' || entity.id === 'stair_sw') {
+    return { x: 357, y: 875, corridorAxis: 'x', corridorValue: 357 };
+  }
+  if (entity.id === 'lift_se' || entity.id === 'stair_se') {
+    return { x: 642, y: 875, corridorAxis: 'x', corridorValue: 642 };
+  }
+  if (entity.id === 'lift_mid_w' || entity.id === 'stair_mid_w') {
+    return { x: 357, y: 365, corridorAxis: 'x', corridorValue: 357 };
+  }
+  if (entity.id === 'lift_mid_e' || entity.id === 'stair_mid_e') {
+    return { x: 642, y: 365, corridorAxis: 'x', corridorValue: 642 };
+  }
+
+  const row = entity.row;
+  const col = entity.col;
+
+  // Row 8 North Concourse
+  if (row === 8) {
+    if (door.x >= 357 && door.x <= 642) {
+      return { x: door.x, y: 225, corridorAxis: 'y', corridorValue: 225 };
+    }
+    if (door.x < 357) return { x: 357, y: 225, corridorAxis: 'y', corridorValue: 225 };
+    return { x: 642, y: 225, corridorAxis: 'y', corridorValue: 225 };
+  }
+
+  // Row 7 Faculty Corridor
+  if (row === 7) {
+    if (door.x < 500) {
+      return { x: 357, y: door.y, corridorAxis: 'x', corridorValue: 357 };
+    }
+    return { x: 642, y: door.y, corridorAxis: 'x', corridorValue: 642 };
+  }
+
+  // Row 6 Main Gallery Concourse
+  if (row === 6) {
+    return { x: door.x, y: 430, corridorAxis: 'y', corridorValue: 430 };
+  }
+
+  // Row 5 Atrium flanks & Outer wings
+  if (row === 5) {
+    if (col && col <= 2) {
+      return { x: 202, y: door.y, corridorAxis: 'x', corridorValue: 202 };
+    }
+    if (col && col >= 7) {
+      return { x: 800, y: door.y, corridorAxis: 'x', corridorValue: 800 };
+    }
+    if (door.x < 500) {
+      return { x: 357, y: door.y, corridorAxis: 'x', corridorValue: 357 };
+    }
+    return { x: 642, y: door.y, corridorAxis: 'x', corridorValue: 642 };
+  }
+
+  // Row 4 Lower Gallery Concourse
+  if (row === 4) {
+    return { x: door.x, y: 620, corridorAxis: 'y', corridorValue: 620 };
+  }
+
+  // Row 3 Seminar Studio Spine
+  if (row === 3) {
+    if (door.x < 500) {
+      return { x: 357, y: door.y, corridorAxis: 'x', corridorValue: 357 };
+    }
+    return { x: 642, y: door.y, corridorAxis: 'x', corridorValue: 642 };
+  }
+
+  // Row 2 / Row 1 Promenade
+  if (row === 2 || row === 1) {
+    if (door.y >= 860) {
+      return { x: door.x, y: 900, corridorAxis: 'y', corridorValue: 900 };
+    }
+    return door.x < 500
+      ? { x: 357, y: 875, corridorAxis: 'x', corridorValue: 357 }
+      : { x: 642, y: 875, corridorAxis: 'x', corridorValue: 642 };
+  }
+
+  // Fallback: project onto nearest graph node
+  let bestNode = 'w_r6_cross';
+  let minDist = Infinity;
+  for (const [nodeKey, node] of Object.entries(GRAPH_NODES)) {
+    const d = dist2D(door.x, door.y, node.x, node.y);
+    if (d < minDist) {
+      minDist = d;
+      bestNode = nodeKey;
+    }
+  }
+  const fallback = GRAPH_NODES[bestNode];
+  return { x: fallback.x, y: fallback.y, corridorAxis: 'none', corridorValue: 0 };
+}
+
+// Map room or vertical core to nearest corridor waypoint in graph
 export function resolveNearestWaypoint(entityId: string, customRooms?: RoomItem[]): string {
   if (entityId === 'lift_sw' || entityId === 'stair_sw' || entityId === 'stairs_sw') return 'w_r2_core';
   if (entityId === 'lift_se' || entityId === 'stair_se' || entityId === 'stairs_se') return 'e_r2_core';
@@ -40,7 +153,21 @@ export function resolveNearestWaypoint(entityId: string, customRooms?: RoomItem[
     bay = parseInt(entityId[3], 10);
   }
 
-  if (!row || !col) return 'w_r6_cross';
+  if (!row || !col) {
+    if (room && room.doorX !== undefined && room.doorY !== undefined) {
+      let closestNode = 'w_r6_cross';
+      let minD = Infinity;
+      for (const [k, n] of Object.entries(GRAPH_NODES)) {
+        const d = dist2D(room.doorX, room.doorY, n.x, n.y);
+        if (d < minD) {
+          minD = d;
+          closestNode = k;
+        }
+      }
+      return closestNode;
+    }
+    return 'w_r6_cross';
+  }
 
   // Row 8 Studios / Labs
   if (row === 8) {
@@ -165,98 +292,179 @@ export function formatTimeEstimate(seconds: number): string {
   return `~${mins}m ${remainingSecs}s walk`;
 }
 
-// Compute single-floor route segment
-function buildSingleFloorSegment(
+// Clean and optimize path points: remove overshoots, duplicates, and backtracking
+function cleanAndTrimRoutePoints(
+  rawPoints: { x: number; y: number }[]
+): { x: number; y: number }[] {
+  if (rawPoints.length <= 1) return rawPoints;
+
+  // 1. Remove duplicate adjacent points (< 3px)
+  const deduped: { x: number; y: number }[] = [];
+  for (const pt of rawPoints) {
+    if (deduped.length === 0) {
+      deduped.push(pt);
+    } else {
+      const last = deduped[deduped.length - 1];
+      if (dist2D(last.x, last.y, pt.x, pt.y) > 2) {
+        deduped.push(pt);
+      }
+    }
+  }
+
+  if (deduped.length <= 2) return deduped;
+
+  // 2. Collinear simplification and overshoot removal
+  const cleaned: { x: number; y: number }[] = [deduped[0]];
+
+  for (let i = 1; i < deduped.length - 1; i++) {
+    const prev = cleaned[cleaned.length - 1];
+    const curr = deduped[i];
+    const next = deduped[i + 1];
+
+    // Check if points are strictly collinear along X axis
+    const isHorizontal = Math.abs(prev.y - curr.y) < 2 && Math.abs(curr.y - next.y) < 2;
+    // Check if points are strictly collinear along Y axis
+    const isVertical = Math.abs(prev.x - curr.x) < 2 && Math.abs(curr.x - next.x) < 2;
+
+    if (isHorizontal) {
+      // Check if curr is between prev and next
+      const isBetween = (curr.x >= Math.min(prev.x, next.x) - 1) && (curr.x <= Math.max(prev.x, next.x) + 1);
+      if (isBetween) {
+        // Redundant intermediate point on straight line
+        continue;
+      }
+      // If curr is beyond both prev and next, it's an overshoot/backtracking!
+      const isOvershoot = (curr.x > Math.max(prev.x, next.x)) || (curr.x < Math.min(prev.x, next.x));
+      if (isOvershoot) {
+        // Skip overshooting node
+        continue;
+      }
+    } else if (isVertical) {
+      const isBetween = (curr.y >= Math.min(prev.y, next.y) - 1) && (curr.y <= Math.max(prev.y, next.y) + 1);
+      if (isBetween) {
+        continue;
+      }
+      const isOvershoot = (curr.y > Math.max(prev.y, next.y)) || (curr.y < Math.min(prev.y, next.y));
+      if (isOvershoot) {
+        continue;
+      }
+    }
+
+    cleaned.push(curr);
+  }
+
+  cleaned.push(deduped[deduped.length - 1]);
+  return cleaned;
+}
+
+// Generate natural, human-friendly turn-by-turn steps from cleaned points
+function generateHumanFriendlySteps(
+  points: { x: number; y: number }[],
   floor: number,
   startObj: EntityItem,
   targetObj: EntityItem,
-  customRooms: RoomItem[],
   isInitialDeparture: boolean,
   isFinalArrival: boolean
-): { segment: FloorRouteSegment; estimatedSeconds: number } {
-  const startWp = resolveNearestWaypoint(startObj.id, customRooms);
-  const endWp = resolveNearestWaypoint(targetObj.id, customRooms);
-
-  const pathWaypointKeys = findShortestPath(startWp, endWp);
-  const routePoints: { x: number; y: number }[] = [];
-
-  // Start Door Point
-  if (startObj.doorX !== undefined && startObj.doorY !== undefined) {
-    routePoints.push({ x: startObj.doorX, y: startObj.doorY });
-  } else if ('x' in startObj && 'y' in startObj) {
-    routePoints.push({ x: (startObj.x ?? 0) + (startObj.w || 60) / 2, y: (startObj.y ?? 0) + (startObj.h || 60) });
-  }
-
-  // Corridor Waypoint Nodes
-  pathWaypointKeys.forEach((key) => {
-    const wp = GRAPH_NODES[key];
-    if (wp) routePoints.push({ x: wp.x, y: wp.y });
-  });
-
-  // Target Door Point
-  if (targetObj.doorX !== undefined && targetObj.doorY !== undefined) {
-    routePoints.push({ x: targetObj.doorX, y: targetObj.doorY });
-  } else if ('x' in targetObj && 'y' in targetObj) {
-    routePoints.push({ x: (targetObj.x ?? 0) + (targetObj.w || 60) / 2, y: (targetObj.y ?? 0) + (targetObj.h || 60) });
-  }
-
-  // Turn-by-Turn step generator
+): NavigationStep[] {
   const steps: NavigationStep[] = [];
 
+  // 1. Departure Step
   if (isInitialDeparture) {
     steps.push({
       icon: 'map-pin',
-      title: `Depart from ${startObj.name} [L${floor}]`,
-      desc: 'Step into the main circulation corridor.',
+      title: `Start at ${startObj.name}`,
+      desc: `Exit room into Floor ${floor} corridor.`,
       floor,
     });
   } else {
     steps.push({
       icon: 'arrow-right-circle',
-      title: `Exit ${startObj.name} on Floor ${floor}`,
-      desc: 'Enter floor corridor heading toward your destination.',
+      title: `Exit ${startObj.name}`,
+      desc: `Enter Floor ${floor} corridor.`,
       floor,
     });
   }
 
-  for (let i = 0; i < pathWaypointKeys.length - 1; i++) {
-    const cur = GRAPH_NODES[pathWaypointKeys[i]];
-    const nxt = GRAPH_NODES[pathWaypointKeys[i + 1]];
-    if (!cur || !nxt) continue;
+  if (points.length < 2) {
+    if (isFinalArrival) {
+      steps.push({
+        icon: 'check-circle-2',
+        title: `Arrive at ${targetObj.name}`,
+        desc: `Your destination is right here on Floor ${floor}.`,
+        floor,
+      });
+    }
+    return steps;
+  }
 
+  // 2. Walk segments & turn analysis
+  for (let i = 0; i < points.length - 1; i++) {
+    const cur = points[i];
+    const nxt = points[i + 1];
     const dx = nxt.x - cur.x;
     const dy = nxt.y - cur.y;
+    const segLen = Math.round(dist2D(cur.x, cur.y, nxt.x, nxt.y) * 0.18); // approx meters
 
-    let action = 'Walk straight along corridor';
+    // Identify direction & orientation
+    let heading = '';
+    let isVert = Math.abs(dy) > Math.abs(dx);
+    if (isVert) {
+      heading = dy < 0 ? 'North' : 'South';
+    } else {
+      heading = dx > 0 ? 'East' : 'West';
+    }
+
+    // Determine turn relative to previous motion
+    let turnAction = `Walk ${heading}`;
     let icon = 'arrow-up';
 
-    if (Math.abs(dy) > Math.abs(dx)) {
-      if (dy < 0) {
-        action = 'Head North along Main Corridor';
-        icon = 'arrow-up';
-      } else {
-        action = 'Head South along Main Corridor';
+    if (i > 0) {
+      const prev = points[i - 1];
+      const prevDx = cur.x - prev.x;
+      const prevDy = cur.y - prev.y;
+
+      // 2D Cross Product (prevDx * dy - prevDy * dx) to determine Left vs Right turn in standard screen coords
+      const cross = prevDx * dy - prevDy * dx;
+      const dot = prevDx * dx + prevDy * dy;
+
+      if (Math.abs(cross) > 100) {
+        if (cross > 0) {
+          turnAction = `Turn Right, head ${heading}`;
+          icon = 'corner-up-right';
+        } else {
+          turnAction = `Turn Left, head ${heading}`;
+          icon = 'corner-up-left';
+        }
+      } else if (dot < -100) {
+        turnAction = 'Turn around';
         icon = 'arrow-down';
-      }
-    } else {
-      if (dx > 0) {
-        action = 'Turn Right along Cross Corridor';
-        icon = 'corner-up-right';
       } else {
-        action = 'Turn Left along Cross Corridor';
-        icon = 'corner-up-left';
+        turnAction = `Continue straight ${heading}`;
+        icon = 'arrow-up';
       }
     }
 
-    const landmark = nxt.label || 'Corridor Junction';
+    // Friendly corridor zone description
+    let corridorName = 'along the corridor';
+    const midY = (cur.y + nxt.y) / 2;
+    const midX = (cur.x + nxt.x) / 2;
+
+    if (midY < 290) corridorName = 'along North Concourse (Row 8)';
+    else if (midY > 370 && midY < 480) corridorName = 'along Central Gallery (Row 6)';
+    else if (midY > 560 && midY < 680) corridorName = 'along Lower Concourse (Row 4)';
+    else if (midY > 820) corridorName = 'towards South Promenade';
+    else if (midX < 365) corridorName = 'along West Main Corridor';
+    else if (midX > 635) corridorName = 'along East Main Corridor';
+
     steps.push({
       icon,
-      title: action,
-      desc: `Proceed towards ${landmark}.`,
+      title: turnAction,
+      desc: `Proceed ${corridorName} (~${Math.max(5, segLen)}m).`,
       floor,
     });
   }
 
+  // 3. Final Arrival Step
   if (isFinalArrival) {
     steps.push({
       icon: 'check-circle-2',
@@ -266,8 +474,77 @@ function buildSingleFloorSegment(
     });
   }
 
-  const stepCount = Math.max(1, pathWaypointKeys.length);
-  const estimatedSeconds = Math.max(15, Math.round(stepCount * 6.5));
+  return steps;
+}
+
+// Compute single-floor route segment with smart corridor projection & no overshoot
+function buildSingleFloorSegment(
+  floor: number,
+  startObj: EntityItem,
+  targetObj: EntityItem,
+  customRooms: RoomItem[],
+  isInitialDeparture: boolean,
+  isFinalArrival: boolean
+): { segment: FloorRouteSegment; estimatedSeconds: number } {
+  const startDoor = getEntityDoor(startObj);
+  const targetDoor = getEntityDoor(targetObj);
+
+  const startAnchor = getCorridorAnchorPoint(startObj);
+  const targetAnchor = getCorridorAnchorPoint(targetObj);
+
+  const rawRoutePoints: { x: number; y: number }[] = [];
+  rawRoutePoints.push(startDoor);
+
+  // Check if both rooms are on the exact same straight corridor
+  const isSameCorridor =
+    startAnchor.corridorAxis !== 'none' &&
+    startAnchor.corridorAxis === targetAnchor.corridorAxis &&
+    Math.abs(startAnchor.corridorValue - targetAnchor.corridorValue) < 8;
+
+  let pathWaypointKeys: string[] = [];
+
+  if (isSameCorridor) {
+    // Same straight corridor: connect directly through corridor line without detour
+    rawRoutePoints.push({ x: startAnchor.x, y: startAnchor.y });
+    rawRoutePoints.push({ x: targetAnchor.x, y: targetAnchor.y });
+    rawRoutePoints.push(targetDoor);
+  } else {
+    // Multi-corridor route: find shortest path via graph
+    const startWp = resolveNearestWaypoint(startObj.id, customRooms);
+    const endWp = resolveNearestWaypoint(targetObj.id, customRooms);
+
+    pathWaypointKeys = findShortestPath(startWp, endWp);
+
+    rawRoutePoints.push({ x: startAnchor.x, y: startAnchor.y });
+
+    // Waypoint nodes along the shortest graph path
+    pathWaypointKeys.forEach((key) => {
+      const wp = GRAPH_NODES[key];
+      if (wp) rawRoutePoints.push({ x: wp.x, y: wp.y });
+    });
+
+    rawRoutePoints.push({ x: targetAnchor.x, y: targetAnchor.y });
+    rawRoutePoints.push(targetDoor);
+  }
+
+  // Clean, trim overshoots, and deduplicate route points
+  const routePoints = cleanAndTrimRoutePoints(rawRoutePoints);
+
+  // Generate crisp, professional turn-by-turn navigation steps
+  const steps = generateHumanFriendlySteps(
+    routePoints,
+    floor,
+    startObj,
+    targetObj,
+    isInitialDeparture,
+    isFinalArrival
+  );
+
+  let totalDistPx = 0;
+  for (let i = 0; i < routePoints.length - 1; i++) {
+    totalDistPx += dist2D(routePoints[i].x, routePoints[i].y, routePoints[i + 1].x, routePoints[i + 1].y);
+  }
+  const estimatedSeconds = Math.max(12, Math.round(totalDistPx * 0.12));
 
   return {
     segment: {

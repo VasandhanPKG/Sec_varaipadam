@@ -6,13 +6,16 @@ import { AuthModal } from '../auth/AuthModal';
 import {
   Compass,
   Layers,
-  ShieldAlert,
+  ShieldCheck,
   LogIn,
   LogOut,
   User,
   Box,
   Map as MapIcon,
   ChevronDown,
+  Shield,
+  KeyRound,
+  GraduationCap,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -25,31 +28,46 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
   const { currentFloor, setCurrentFloor, floorsMeta } = useRooms();
   const { user, logout, isAdmin } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'student' | 'admin'>('student');
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const isHome = location.pathname === '/';
   const isAdminPage = location.pathname === '/admin';
 
+  const openAdminLogin = () => {
+    setAuthModalTab('admin');
+    setShowAuthModal(true);
+  };
+
+  const openStudentLogin = () => {
+    setAuthModalTab('student');
+    setShowAuthModal(true);
+  };
+
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between text-slate-100 shadow-lg">
+      <header className="sticky top-0 z-40 w-full bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 px-4 py-2.5 flex items-center justify-between text-slate-100 shadow-lg">
         {/* Brand */}
         <div className="flex items-center space-x-3">
           <Link to="/" className="flex items-center space-x-2.5 group">
-            <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <Compass className="w-5 h-5 animate-pulse" />
+            <div className="relative">
+              <img
+                src="/logo.png"
+                alt="SEC வரைபடம்"
+                className="w-10 h-10 rounded-full object-cover ring-2 ring-amber-500/50 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform"
+              />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-white bg-clip-text text-transparent">
-                  SecMap
+                <span className="font-black text-lg tracking-tight bg-gradient-to-r from-amber-400 via-yellow-200 to-white bg-clip-text text-transparent">
+                  SEC வரைபடம்
                 </span>
-                <span className="px-1.5 py-0.5 text-[10px] font-mono uppercase bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded">
-                  v2.5
+                <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded font-bold">
+                  SEC VARAIPADAM
                 </span>
               </div>
               <p className="text-[10px] font-mono text-slate-400 hidden sm:block">
-                CAMPUS SPATIAL TWIN & CAD SYSTEM
+                CAMPUS 3D MAP & INDOOR NAVIGATION
               </p>
             </div>
           </Link>
@@ -110,28 +128,31 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
           )}
         </div>
 
-        {/* Right: Nav Links & Auth Profile */}
+        {/* Right: Admin Link (ONLY FOR ADMIN) & Auth Profile */}
         <div className="flex items-center space-x-3">
-          <Link
-            to={isAdminPage ? '/' : '/admin'}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-medium rounded-xl border transition ${
-              isAdminPage
-                ? 'bg-blue-600/20 text-blue-300 border-blue-500/30 hover:bg-blue-600/30'
-                : 'bg-slate-900/80 text-slate-300 border-slate-800 hover:border-slate-700 hover:text-white'
-            }`}
-          >
-            {isAdminPage ? (
-              <>
-                <MapIcon className="w-3.5 h-3.5 text-blue-400" />
-                <span className="hidden sm:inline">View Blueprint</span>
-              </>
-            ) : (
-              <>
-                <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-                <span className="hidden sm:inline">Admin Studio</span>
-              </>
-            )}
-          </Link>
+          {/* Admin Studio Link - STRICTLY HIDDEN FOR STUDENTS & GUESTS */}
+          {isAdmin && (
+            <Link
+              to={isAdminPage ? '/' : '/admin'}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition shadow-sm ${
+                isAdminPage
+                  ? 'bg-blue-600 text-white border-blue-500 shadow-blue-600/20'
+                  : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20 hover:text-white'
+              }`}
+            >
+              {isAdminPage ? (
+                <>
+                  <MapIcon className="w-3.5 h-3.5 text-blue-200" />
+                  <span className="hidden sm:inline">View Blueprint</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Admin Studio</span>
+                </>
+              )}
+            </Link>
+          )}
 
           {/* User Auth Dropdown */}
           {user ? (
@@ -140,38 +161,55 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center space-x-2 p-1.5 pl-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition text-xs text-slate-200"
               >
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName || 'User'}
-                    className="w-5 h-5 rounded-full ring-1 ring-blue-500"
-                  />
-                ) : (
-                  <div className="w-5 h-5 rounded-full bg-blue-600/30 text-blue-300 flex items-center justify-center font-bold text-[10px]">
-                    {user.displayName?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                )}
+                <div
+                  className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
+                    isAdmin ? 'bg-amber-500/20 text-amber-400' : 'bg-blue-600/30 text-blue-300'
+                  }`}
+                >
+                  {isAdmin ? <Shield className="w-3 h-3 text-amber-400" /> : <GraduationCap className="w-3 h-3 text-blue-400" />}
+                </div>
                 <span className="max-w-[100px] truncate hidden md:inline font-medium">
                   {user.displayName || user.email}
                 </span>
-                <span className="text-[10px] px-1.5 py-0.2 bg-slate-800 text-slate-400 font-mono uppercase rounded">
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 font-mono uppercase rounded font-bold ${
+                    isAdmin ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'
+                  }`}
+                >
                   {user.role}
                 </span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1.5 z-50 text-xs">
-                  <div className="px-3 py-2 border-b border-slate-800">
-                    <p className="font-semibold text-white truncate">{user.displayName}</p>
+                <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl py-1.5 z-50 text-xs animate-fadeIn">
+                  <div className="px-3.5 py-2.5 border-b border-slate-800">
+                    <p className="font-bold text-white truncate">{user.displayName}</p>
                     <p className="text-[11px] text-slate-400 truncate">{user.email}</p>
+                    <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono capitalize">
+                      Role: {user.role}
+                    </span>
                   </div>
+
+                  {!isAdmin && (
+                    <button
+                      onClick={() => {
+                        setShowUserMenu(false);
+                        openAdminLogin();
+                      }}
+                      className="w-full flex items-center space-x-2 px-3.5 py-2 text-amber-400 hover:bg-slate-800/80 transition"
+                    >
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>Admin Sign In</span>
+                    </button>
+                  )}
+
                   <button
                     onClick={() => {
                       logout();
                       setShowUserMenu(false);
                     }}
-                    className="w-full flex items-center space-x-2 px-3 py-2 text-red-400 hover:bg-slate-800/80 transition"
+                    className="w-full flex items-center space-x-2 px-3.5 py-2 text-red-400 hover:bg-slate-800/80 transition"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>
@@ -180,18 +218,24 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
               )}
             </div>
           ) : (
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-blue-600/20 transition active:scale-95"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Sign In</span>
-            </button>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={openStudentLogin}
+                className="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-md shadow-blue-600/20 transition active:scale-95"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </button>
+            </div>
           )}
         </div>
       </header>
 
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        defaultTab={authModalTab}
+      />
     </>
   );
 };

@@ -108,6 +108,8 @@ export function HomePage() {
             activeRoute={activeRoute}
             selectedEntity={selectedEntity}
             onSelectEntity={handleSelectEntity}
+            onCalculateRoute={handleCalculateRoute}
+            onClearRoute={handleClearRoute}
           />
         )}
       </div>

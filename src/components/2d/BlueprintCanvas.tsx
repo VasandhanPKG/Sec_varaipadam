@@ -994,22 +994,10 @@ export function BlueprintCanvas({
               })}
             </g>
 
-            {/* LAYER 4: Backstage Rooms */}
-            <g id="layerBackstage" fill="#cbd5e1" stroke="#64748b" strokeWidth="1.2">
-              <rect x="315" y="915" width="82" height="30" rx="2" />
-              <text x="356" y="934" fill="#334155" fontSize="8" fontFamily="sans-serif" textAnchor="middle" fontWeight="semibold">Green Room</text>
-              <rect x="402" y="915" width="82" height="30" rx="2" />
-              <text x="443" y="934" fill="#334155" fontSize="8" fontFamily="sans-serif" textAnchor="middle" fontWeight="semibold">Control</text>
-              <rect x="490" y="915" width="88" height="30" rx="2" />
-              <text x="534" y="934" fill="#334155" fontSize="8" fontFamily="sans-serif" textAnchor="middle" fontWeight="semibold">Projector Room</text>
-              <rect x="583" y="915" width="76" height="30" rx="2" />
-              <text x="621" y="934" fill="#334155" fontSize="8" fontFamily="sans-serif" textAnchor="middle" fontWeight="semibold">Store 1</text>
-            </g>
-
             {/* Stage Bar */}
             <g id="layerStage">
-              <path d="M 315,948 L 659,948" stroke="#cbd5e1" strokeWidth="1.5" />
-              <text x="500" y="962" fill="#475569" fontSize="9" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle" letterSpacing="1">
+              <rect x="340" y="940" width="320" height="24" rx="3" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1.2" />
+              <text x="500" y="956" fill="#475569" fontSize="10" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle" letterSpacing="2">
                 STAGE
               </text>
             </g>
@@ -1138,25 +1126,17 @@ export function BlueprintCanvas({
                   strokeLinejoin="round"
                 />
 
-                {/* You Are Here Start Pin */}
+                {/* Start Marker */}
                 {startPoint && (
                   <g>
-                    <circle cx={startPoint.x} cy={startPoint.y} r="16" fill="#2563eb" opacity="0.3" className="target-ping" />
-                    <circle cx={startPoint.x} cy={startPoint.y} r="7" fill="#2563eb" stroke="#ffffff" strokeWidth="2.5" />
+                    <circle cx={startPoint.x} cy={startPoint.y} r="4" fill="#1e3a8a" stroke="#ffffff" strokeWidth="1.5" />
                   </g>
                 )}
 
-                {/* Destination Red Pin */}
+                {/* Destination Marker */}
                 {endPoint && (
                   <g transform={`translate(${endPoint.x}, ${endPoint.y})`}>
-                    <circle cx="0" cy="0" r="18" fill="#e11d48" opacity="0.3" className="target-ping" />
-                    <path
-                      d="M 0,-18 C -6,-18 -10,-14 -10,-8 C -10,0 0,10 0,10 C 0,10 10,0 10,-8 C 10,-14 6,-18 0,-18 Z"
-                      fill="#e11d48"
-                      stroke="#ffffff"
-                      strokeWidth="1.5"
-                    />
-                    <circle cx="0" cy="-8" r="3.5" fill="#ffffff" />
+                    <circle cx="0" cy="0" r="4" fill="#1e3a8a" stroke="#ffffff" strokeWidth="1.5" />
                   </g>
                 )}
               </g>

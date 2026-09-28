@@ -9,32 +9,37 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider } from '../lib/firebase';
 
+export const ADMIN_MASTER_PASSWORD = 'admin@0718';
+
 export interface AppUser {
   uid: string;
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
-  role: 'guest' | 'student' | 'faculty' | 'admin';
+  role: 'student' | 'admin' | 'faculty';
 }
 
 interface AuthContextType {
   user: AppUser | null;
   firebaseUser: User | null;
   loading: boolean;
+  isAdmin: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
-  loginDemo: (role: 'student' | 'faculty' | 'admin') => void;
+  loginAdmin: (password: string, emailOrName?: string) => boolean;
+  loginStudent: (displayName?: string, email?: string) => void;
   logout: () => Promise<void>;
-  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const STORAGE_USER_KEY = 'secmap_auth_user_v2';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [user, setUser] = useState<AppUser | null>(() => {
-    const saved = localStorage.getItem('secmap_demo_user');
+    const saved = localStorage.getItem(STORAGE_USER_KEY);
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -44,35 +49,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return null;
   });
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
-        const role = fbUser.email?.includes('admin') ? 'admin' : 'student';
+        // Firebase user login defaults to student unless explicitly stored as admin
+        const saved = localStorage.getItem(STORAGE_USER_KEY);
+        let currentRole: 'student' | 'admin' = 'student';
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            if (parsed.role === 'admin') currentRole = 'admin';
+          } catch {}
+        }
+
         const mappedUser: AppUser = {
           uid: fbUser.uid,
           email: fbUser.email,
-          displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'User',
+          displayName: fbUser.displayName || fbUser.email?.split('@')[0] || 'Student',
           photoURL: fbUser.photoURL,
-          role,
+          role: currentRole,
         };
         setUser(mappedUser);
-        localStorage.removeItem('secmap_demo_user');
-      } else {
-        const saved = localStorage.getItem('secmap_demo_user');
-        if (saved) {
-          try {
-            setUser(JSON.parse(saved));
-          } catch {
-            setUser(null);
-          }
-        } else {
-          setUser(null);
-        }
+        localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(mappedUser));
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -81,7 +83,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithGoogle = async () => {
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      const res = await signInWithPopup(auth, googleProvider);
+      const studentUser: AppUser = {
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName || 'Student',
+        photoURL: res.user.photoURL,
+        role: 'student',
+      };
+      setUser(studentUser);
+      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(studentUser));
     } catch (err) {
       console.error('Firebase Google Sign-In error:', err);
       throw err;
@@ -93,7 +104,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signInWithEmail = async (email: string, pass: string) => {
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, pass);
+      const res = await signInWithEmailAndPassword(auth, email, pass);
+      const studentUser: AppUser = {
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName || email.split('@')[0] || 'Student',
+        photoURL: res.user.photoURL,
+        role: 'student',
+      };
+      setUser(studentUser);
+      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(studentUser));
     } catch (err) {
       console.error('Firebase Email Sign-In error:', err);
       throw err;
@@ -105,7 +125,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUpWithEmail = async (email: string, pass: string) => {
     setLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, pass);
+      const res = await createUserWithEmailAndPassword(auth, email, pass);
+      const studentUser: AppUser = {
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName || email.split('@')[0] || 'Student',
+        photoURL: res.user.photoURL,
+        role: 'student',
+      };
+      setUser(studentUser);
+      localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(studentUser));
     } catch (err) {
       console.error('Firebase Email Sign-Up error:', err);
       throw err;
@@ -114,16 +143,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginDemo = (role: 'student' | 'faculty' | 'admin') => {
-    const demoUser: AppUser = {
-      uid: `demo_${role}_${Date.now()}`,
-      email: `${role}@secmap.edu`,
-      displayName: role.charAt(0).toUpperCase() + role.slice(1) + ' User',
+  // Dedicated Admin Login with mandatory password check: admin@0718
+  const loginAdmin = (password: string, emailOrName?: string): boolean => {
+    if (password !== ADMIN_MASTER_PASSWORD) {
+      return false;
+    }
+
+    const adminUser: AppUser = {
+      uid: `admin_${Date.now()}`,
+      email: emailOrName?.includes('@') ? emailOrName : 'admin@secmap.edu',
+      displayName: emailOrName && !emailOrName.includes('@') ? emailOrName : 'Administrator',
       photoURL: null,
-      role,
+      role: 'admin',
     };
-    setUser(demoUser);
-    localStorage.setItem('secmap_demo_user', JSON.stringify(demoUser));
+
+    setUser(adminUser);
+    localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(adminUser));
+    return true;
+  };
+
+  // Student Fast / Standard Login
+  const loginStudent = (displayName?: string, email?: string) => {
+    const studentUser: AppUser = {
+      uid: `student_${Date.now()}`,
+      email: email || 'student@secmap.edu',
+      displayName: displayName || 'Student User',
+      photoURL: null,
+      role: 'student',
+    };
+    setUser(studentUser);
+    localStorage.setItem(STORAGE_USER_KEY, JSON.stringify(studentUser));
   };
 
   const logout = async () => {
@@ -131,14 +180,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (firebaseUser) {
         await signOut(auth);
       }
+    } catch (e) {
+      console.warn('Sign out notice:', e);
     } finally {
-      localStorage.removeItem('secmap_demo_user');
+      localStorage.removeItem(STORAGE_USER_KEY);
       setUser(null);
       setFirebaseUser(null);
     }
   };
 
-  const isAdmin = user?.role === 'admin' || !!user?.email?.includes('admin');
+  const isAdmin = user?.role === 'admin';
 
   return (
     <AuthContext.Provider
@@ -146,12 +197,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         firebaseUser,
         loading,
+        isAdmin,
         signInWithGoogle,
         signInWithEmail,
         signUpWithEmail,
-        loginDemo,
+        loginAdmin,
+        loginStudent,
         logout,
-        isAdmin,
       }}
     >
       {children}

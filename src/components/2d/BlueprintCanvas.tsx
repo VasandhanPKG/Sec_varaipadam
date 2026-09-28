@@ -409,24 +409,30 @@ export function BlueprintCanvas({
           </div>
         )}
 
-        {/* Fast Search Input with Autocomplete Dropdown */}
+        {/* Fast Class Number Input (No Suggestions Popup, Just Room Number) */}
         <div className="p-2 sm:p-3">
-          <div className="flex items-center gap-2">
-            {/* Destination Search Box */}
-            <div ref={destContainerRef} className="relative flex-1 min-w-0">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleTriggerRoute();
+            }}
+            className="flex items-center gap-2"
+          >
+            {/* Destination Class Number Box */}
+            <div className="relative flex-1 min-w-0">
               <div className="flex items-center gap-2 bg-white border border-[#ded4c0] focus-within:border-[#1e354d] focus-within:ring-2 focus-within:ring-[#1e354d]/10 rounded-xl px-2.5 sm:px-3 py-2 transition shadow-sm">
                 <Flag className="w-4 h-4 text-blue-600 shrink-0" />
                 <div className="flex-1 min-w-0">
                   <input
                     type="text"
+                    autoComplete="off"
                     value={destInputText}
-                    onFocus={() => setIsDestOpen(true)}
                     onChange={(e) => {
                       setDestInputText(e.target.value);
-                      setIsDestOpen(true);
+                      setDemoTargetId(e.target.value);
                     }}
-                    placeholder="Type class number (e.g. 6853, 6411, 4151, Lab...)"
-                    className="w-full bg-transparent text-xs sm:text-sm font-bold text-[#11202f] focus:outline-none placeholder-[#8a99a8] truncate"
+                    placeholder="Type class number (e.g. 6853, 6411, 4151...)"
+                    className="w-full bg-transparent text-xs sm:text-sm font-mono font-bold text-[#11202f] focus:outline-none placeholder-[#8a99a8] truncate"
                   />
                 </div>
                 {destInputText && (
@@ -434,7 +440,7 @@ export function BlueprintCanvas({
                     type="button"
                     onClick={() => {
                       setDestInputText('');
-                      setIsDestOpen(true);
+                      setDemoTargetId('');
                     }}
                     className="p-1 text-[#8a99a8] hover:text-[#11202f]"
                   >
@@ -442,85 +448,18 @@ export function BlueprintCanvas({
                   </button>
                 )}
               </div>
-
-              {/* Destination Suggestions Dropdown */}
-              {isDestOpen && (
-                <div className="absolute bottom-full left-0 right-0 mb-1.5 bg-white border border-[#ded4c0] rounded-2xl shadow-2xl max-h-56 overflow-y-auto z-50 p-1.5 divide-y divide-[#faf8f3]">
-                  {destSuggestions.length === 0 ? (
-                    <div className="p-3 text-center text-xs text-[#64748b] font-medium">
-                      No matching class or room found
-                    </div>
-                  ) : (
-                    destSuggestions.map((item) => (
-                      <div
-                        key={`dest_sugg_${item.id}`}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          handleSelectDestItem(item);
-                          // Calculate route immediately upon selection
-                          let sFloor = currentFloor;
-                          let tFloor = item.floor || currentFloor;
-                          if (onCalculateRoute) {
-                            onCalculateRoute(demoStartId || 'lift_sw', item.id, sFloor, tFloor);
-                          }
-                        }}
-                        className="px-3 py-2 rounded-xl hover:bg-[#f3ede1] cursor-pointer flex items-center justify-between transition text-xs"
-                      >
-                        <div className="min-w-0 pr-2">
-                          <div className="font-mono font-bold text-[#1e354d] flex items-center gap-1.5">
-                            <span>{item.id}</span>
-                            <span className="px-1.5 py-0.2 bg-[#dbe4eb] text-[#1e354d] rounded text-[9px] font-sans font-medium">
-                              L0{item.floor}
-                            </span>
-                          </div>
-                          <div className="text-[#11202f] font-medium truncate mt-0.5">{item.name}</div>
-                        </div>
-                        <span className="text-[9px] font-bold text-[#1e354d] uppercase bg-[#dbe4eb] px-2 py-0.5 rounded border border-[#cad7e2] shrink-0">
-                          {item.type}
-                        </span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
             </div>
 
             {/* Direct Route Go Button */}
             <button
-              onClick={handleTriggerRoute}
+              type="submit"
               className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-[#1e354d] hover:bg-[#162a3f] active:scale-95 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-[#1e354d]/20 shrink-0 transition"
               title="Calculate route"
             >
               <Send className="w-3.5 h-3.5 text-[#ded4c0]" />
               <span className="hidden sm:inline">Navigate</span>
             </button>
-          </div>
-
-          {/* Quick-Pick Destination Category Chips for Fast 1-Tap Search */}
-          <div className="flex items-center gap-1.5 mt-2 overflow-x-auto no-scrollbar py-0.5">
-            {[
-              { label: 'Auditorium', id: `${currentFloor}151` },
-              { label: 'Communication Lab', id: `${currentFloor}581` },
-              { label: 'Electronics Lab', id: `${currentFloor}582` },
-              { label: 'SW Lift', id: 'lift_sw' },
-              { label: 'Restroom', id: `${currentFloor}511` },
-            ].map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                onClick={() => {
-                  setDemoTargetId(chip.id);
-                  setDestInputText(chip.label);
-                  if (onCalculateRoute) {
-                    onCalculateRoute('lift_sw', chip.id, currentFloor, currentFloor);
-                  }
-                }}
-                className="px-2.5 py-1 rounded-lg bg-[#faf8f3] hover:bg-[#ede5d6] text-[#1e354d] border border-[#ded4c0] text-[10.5px] font-semibold whitespace-nowrap shrink-0 transition shadow-2xs"
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
+          </form>
         </div>
       </div>
 

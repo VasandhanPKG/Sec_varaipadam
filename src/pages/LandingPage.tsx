@@ -19,6 +19,13 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail, loginStudent, logout, isAdmin } = useAuth();
 
+  // If already logged in, do not show login page - redirect straight to Route selection
+  React.useEffect(() => {
+    if (user) {
+      navigate('/route', { replace: true });
+    }
+  }, [user, navigate]);
+
   // Admin Modal state
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
@@ -29,6 +36,10 @@ export const LandingPage: React.FC = () => {
   const [name, setName] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authLoading, setAuthLoading] = useState(false);
+
+  if (user) {
+    return null;
+  }
 
   // Handle Sign In / Create Account
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -177,26 +188,7 @@ export const LandingPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Active user status banner if already signed in */}
-          {user && (
-            <div className="mb-4 p-3 bg-[#f7f5ee] border border-[#ded4c0] rounded-2xl flex items-center justify-between">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 rounded-full bg-[#dbe4eb] text-[#1e354d] flex items-center justify-center font-bold text-xs">
-                  {user.role === 'admin' ? <Shield className="w-3.5 h-3.5 text-[#1e354d]" /> : <GraduationCap className="w-3.5 h-3.5 text-[#1e354d]" />}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-bold text-[#11202f] truncate">{user.displayName || user.email}</p>
-                  <span className="text-[10px] font-mono text-[#64748b] uppercase">{user.role} active</span>
-                </div>
-              </div>
-              <button
-                onClick={() => logout()}
-                className="text-[11px] text-rose-600 hover:text-rose-700 font-semibold underline"
-              >
-                Sign Out
-              </button>
-            </div>
-          )}
+          {/* Error Banner */}
 
           {/* Error Banner */}
           {authError && (

@@ -94,12 +94,27 @@ function ProtectedAdminRoute({ children }: { children: React.ReactNode }) {
   );
 }
 
+function RootRoute() {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f7f5ee] spaceplanner-grid-bg flex items-center justify-center font-serif font-bold text-sm text-[#11202f]">
+        Loading SEC வரைபடம்...
+      </div>
+    );
+  }
+  if (user) {
+    return <Navigate to="/route" replace />;
+  }
+  return <LandingPage />;
+}
+
 export function App() {
   return (
     <AuthProvider>
       <RoomsProvider>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<RootRoute />} />
           <Route path="/route" element={<RouteSelectionPage />} />
           <Route path="/map" element={<HomePage />} />
           <Route

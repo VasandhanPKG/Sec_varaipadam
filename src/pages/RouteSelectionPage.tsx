@@ -88,24 +88,42 @@ export const RouteSelectionPage: React.FC = () => {
           </div>
         </Link>
 
-        {/* User Status & Admin Login */}
-        <div className="flex items-center space-x-2.5">
-          {user && (
-            <div className="flex items-center space-x-2 px-3 py-1.5 bg-[#fcfaf6] border border-[#ded4c0] rounded-xl text-xs">
-              <div className="w-5 h-5 rounded-full bg-[#dbe4eb] text-[#1e354d] flex items-center justify-center font-bold text-[10px]">
-                {isAdmin ? <Shield className="w-3 h-3 text-[#1e354d]" /> : <GraduationCap className="w-3 h-3 text-[#1e354d]" />}
+        {/* User Status & Admin Login & Logout */}
+        <div className="flex items-center space-x-2 sm:space-x-2.5">
+          {user ? (
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 bg-[#fcfaf6] border border-[#ded4c0] rounded-xl text-xs shadow-xs">
+                <div className="w-5 h-5 rounded-full bg-[#dbe4eb] text-[#1e354d] flex items-center justify-center font-bold text-[10px]">
+                  {isAdmin ? <Shield className="w-3 h-3 text-[#1e354d]" /> : <GraduationCap className="w-3 h-3 text-[#1e354d]" />}
+                </div>
+                <span className="font-medium text-[#11202f] max-w-[110px] truncate hidden md:inline">
+                  {user.displayName || user.email}
+                </span>
+                <span className="text-[9.5px] px-1.5 py-0.2 font-mono uppercase bg-[#dbe4eb] text-[#1e354d] rounded font-bold">
+                  {user.role}
+                </span>
               </div>
-              <span className="font-medium text-[#11202f] max-w-[120px] truncate hidden md:inline">
-                {user.displayName || user.email}
-              </span>
+
+              {/* Dedicated Logout Button */}
               <button
-                onClick={() => logout()}
-                className="text-[#8a99a8] hover:text-rose-600 transition ml-1"
-                title="Sign Out"
+                onClick={async () => {
+                  await logout();
+                  navigate('/');
+                }}
+                className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition shadow-xs active:scale-95"
+                title="Log Out of your account"
               >
                 <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
               </button>
             </div>
+          ) : (
+            <Link
+              to="/"
+              className="flex items-center space-x-1 px-3 py-1.5 bg-[#1e354d] hover:bg-[#162a3f] text-white rounded-xl text-xs font-bold transition"
+            >
+              Sign In
+            </Link>
           )}
 
           <button
@@ -114,7 +132,7 @@ export const RouteSelectionPage: React.FC = () => {
             title="Administrator Login (Password only)"
           >
             <Shield className="w-3.5 h-3.5 fill-white text-[#1e354d]" />
-            <span>Admin Login</span>
+            <span className="hidden xs:inline">Admin Login</span>
           </button>
         </div>
       </header>

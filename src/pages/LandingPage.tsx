@@ -189,8 +189,6 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Error Banner */}
-
-          {/* Error Banner */}
           {authError && (
             <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs animate-shake">
               {authError}

@@ -37,7 +37,8 @@ interface RoomsContextType {
 
 const RoomsContext = createContext<RoomsContextType | null>(null);
 
-const STORAGE_KEY = 'secmap_all_floors_v2';
+const STORAGE_KEY = 'secmap_all_floors_v3';
+const LEGACY_STORAGE_KEY_V2 = 'secmap_all_floors_v2';
 const LEGACY_STORAGE_KEY = 'secmap_all_floors_v1';
 
 export function RoomsProvider({ children }: { children: React.ReactNode }) {
@@ -49,18 +50,24 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
   // Load persisted custom rooms from localStorage on mount and sanitize floor isolation
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+      const saved =
+        localStorage.getItem(STORAGE_KEY) ||
+        localStorage.getItem(LEGACY_STORAGE_KEY_V2) ||
+        localStorage.getItem(LEGACY_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
           const sanitized: Record<number, RoomItem[]> = {};
           [1, 2, 3, 4, 5, 6].forEach((fl) => {
             if (Array.isArray(parsed[fl])) {
-              // Ensure all rooms strictly belong to floor `fl` and have correct floor property
-              sanitized[fl] = parsed[fl].map((r: RoomItem) => ({
-                ...r,
-                floor: fl,
-              }));
+              // Ensure all rooms strictly belong to floor `fl` and have correct floor property,
+              // and filter out deprecated rooms overlapping the West VOID (row 4, col 3)
+              sanitized[fl] = parsed[fl]
+                .filter((r: RoomItem) => !(r.row === 4 && r.col === 3) && !['431', '432', '433'].some((code) => r.id?.endsWith(code)))
+                .map((r: RoomItem) => ({
+                  ...r,
+                  floor: fl,
+                }));
             }
           });
           if (Object.keys(sanitized).length > 0) {

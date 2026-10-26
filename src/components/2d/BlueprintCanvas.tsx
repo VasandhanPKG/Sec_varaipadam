@@ -58,7 +58,12 @@ export function BlueprintCanvas({
   const { rooms, cores, currentFloor, setCurrentFloor, allFloorsRooms } = useRooms();
   const [hoveredEntity, setHoveredEntity] = useState<EntityItem | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isDirectionsExpanded, setIsDirectionsExpanded] = useState(true);
+  const [isDirectionsExpanded, setIsDirectionsExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 640;
+    }
+    return true;
+  });
 
   // Bottom Demo Card Local Selector & Type-Ahead States
   const [demoStartId, setDemoStartId] = useState<string>(`${currentFloor}151`);
@@ -340,28 +345,30 @@ export function BlueprintCanvas({
                   <button
                     type="button"
                     onClick={() => setCurrentFloor(activeRoute.startFloor)}
-                    className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center justify-between border ${
+                    className={`px-2 sm:px-2.5 py-1.5 rounded-xl text-[10.5px] sm:text-[11px] font-bold transition flex items-center justify-between border ${
                       currentFloor === activeRoute.startFloor
                         ? 'bg-[#1e354d] text-white border-[#1e354d] shadow-sm'
                         : 'bg-white hover:bg-[#ede5d6] text-[#1e354d] border-[#ded4c0]'
                     }`}
                   >
-                    <span className="truncate">1. Floor {activeRoute.startFloor} ➔ Lift</span>
-                    <span className="font-mono text-[10px] ml-1 shrink-0">L0{activeRoute.startFloor}</span>
+                    <span className="truncate sm:hidden">1. L0{activeRoute.startFloor} ➔ Lift</span>
+                    <span className="truncate hidden sm:inline">1. Floor {activeRoute.startFloor} ➔ Lift</span>
+                    <span className="font-mono text-[9.5px] sm:text-[10px] ml-1 shrink-0">L0{activeRoute.startFloor}</span>
                   </button>
 
                   {/* Leg 2 Button */}
                   <button
                     type="button"
                     onClick={() => setCurrentFloor(activeRoute.targetFloor)}
-                    className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center justify-between border ${
+                    className={`px-2 sm:px-2.5 py-1.5 rounded-xl text-[10.5px] sm:text-[11px] font-bold transition flex items-center justify-between border ${
                       currentFloor === activeRoute.targetFloor
                         ? 'bg-[#1e354d] text-white border-[#1e354d] shadow-sm'
                         : 'bg-white hover:bg-[#ede5d6] text-[#1e354d] border-[#ded4c0]'
                     }`}
                   >
-                    <span className="truncate">2. Lift ➔ Floor {activeRoute.targetFloor}</span>
-                    <span className="font-mono text-[10px] ml-1 shrink-0">L0{activeRoute.targetFloor}</span>
+                    <span className="truncate sm:hidden">2. Lift ➔ L0{activeRoute.targetFloor}</span>
+                    <span className="truncate hidden sm:inline">2. Lift ➔ Floor {activeRoute.targetFloor}</span>
+                    <span className="font-mono text-[9.5px] sm:text-[10px] ml-1 shrink-0">L0{activeRoute.targetFloor}</span>
                   </button>
                 </div>
               </div>

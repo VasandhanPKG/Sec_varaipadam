@@ -11,10 +11,6 @@ export const ROOMS_DATA: RoomItem[] = [
   // Outer West Wing (Cols 1-2)
   { id: "6411", std: "6411", name: "Classroom 6411", type: "classroom", capacity: 45, row: 4, col: 1, bay: 1, x: 95, y: 645, w: 60, h: 60, doorX: 125, doorY: 620, desc: "West Wing lecture classroom." },
   { id: "6412", std: "6412", name: "Classroom 6412", type: "classroom", capacity: 45, row: 4, col: 1, bay: 2, x: 160, y: 645, w: 60, h: 60, doorX: 190, doorY: 620, desc: "West Wing lecture classroom." },
-  // Row 4 Col 3 Rooms (6431-6433)
-  { id: "6431", std: "6431", name: "Classroom 6431", type: "classroom", capacity: 40, row: 4, col: 3, bay: 1, x: 260, y: 645, w: 75, h: 55, doorX: 345, doorY: 620, desc: "MBA Classroom 6431." },
-  { id: "6432", std: "6432", name: "Classroom 6432", type: "classroom", capacity: 40, row: 4, col: 3, bay: 2, x: 260, y: 585, w: 75, h: 55, doorX: 345, doorY: 570, desc: "MBA Classroom 6432." },
-  { id: "6433", std: "6433", name: "Classroom 6433", type: "classroom", capacity: 40, row: 4, col: 3, bay: 3, x: 260, y: 525, w: 75, h: 55, doorX: 345, doorY: 520, desc: "MBA Classroom 6433." },
   // Central Bar (Cols 4,5,6)
   { id: "6451", std: "6451", name: "Classroom 6451", type: "classroom", capacity: 50, row: 4, col: 5, bay: 1, x: 382, y: 645, w: 56, h: 60, doorX: 410, doorY: 620, desc: "Direct access tiered lecture hall." },
   { id: "6452", std: "6452", name: "Classroom 6452", type: "classroom", capacity: 50, row: 4, col: 5, bay: 2, x: 442, y: 645, w: 56, h: 60, doorX: 470, doorY: 620, desc: "Audio-visual equipped collaborative hall." },

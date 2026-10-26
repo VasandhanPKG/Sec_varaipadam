@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
             />
             <div>
               <div className="flex items-center space-x-1.5">
-                <span className="font-black text-sm sm:text-base tracking-tight bg-gradient-to-r from-amber-400 via-yellow-200 to-white bg-clip-text text-transparent">
+                <span className="font-black text-xs sm:text-base tracking-tight bg-gradient-to-r from-amber-400 via-yellow-200 to-white bg-clip-text text-transparent">
                   SEC வரைபடம்
                 </span>
                 <span className="hidden md:inline-block px-1.5 py-0.2 text-[8.5px] font-mono uppercase bg-amber-500/15 text-amber-300 border border-amber-500/30 rounded font-bold">
@@ -75,49 +75,49 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
           <div className="flex items-center bg-slate-900/90 border border-slate-800 rounded-xl p-0.5 sm:p-1 shadow-inner shrink-0">
             <button
               onClick={() => onViewModeChange('2d')}
-              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition ${
+              className={`flex items-center space-x-1 px-2 sm:px-3 py-1 text-xs font-semibold rounded-lg transition ${
                 viewMode === '2d'
                   ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
               title="2D Blueprint View"
             >
-              <MapIcon className="w-3.5 h-3.5" />
-              <span>2D Blueprint</span>
+              <MapIcon className="w-3.5 h-3.5 shrink-0" />
+              <span>2D<span className="hidden sm:inline"> Blueprint</span></span>
             </button>
             <button
               onClick={() => onViewModeChange('3d')}
-              className={`flex items-center space-x-1 px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-lg transition ${
+              className={`flex items-center space-x-1 px-2 sm:px-3 py-1 text-xs font-semibold rounded-lg transition ${
                 viewMode === '3d'
                   ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
                   : 'text-slate-400 hover:text-white hover:bg-slate-800'
               }`}
               title="3D Building Twin"
             >
-              <Box className="w-3.5 h-3.5" />
-              <span>3D Twin</span>
+              <Box className="w-3.5 h-3.5 shrink-0" />
+              <span>3D<span className="hidden sm:inline"> Twin</span></span>
             </button>
           </div>
         )}
 
         {/* Right: Admin Link & Auth */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
+        <div className="flex items-center space-x-1 sm:space-x-2 shrink-0">
           {/* Admin Studio Link if already logged in as Admin */}
           {isAdmin ? (
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center space-x-1 sm:space-x-1.5">
               {isAdminPage && (
                 <Link
                   to="/route"
-                  className="flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                  className="flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
                   title="Return to Route Planner"
                 >
-                  <Compass className="w-3.5 h-3.5 text-blue-400" />
+                  <Compass className="w-3.5 h-3.5 text-blue-400 shrink-0" />
                   <span className="hidden sm:inline">Planner</span>
                 </Link>
               )}
               <Link
                 to={isAdminPage ? '/map' : '/admin'}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition shadow-sm ${
+                className={`flex items-center space-x-1 sm:space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-bold rounded-xl border transition shadow-sm ${
                   isAdminPage
                     ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-blue-600/20'
                     : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25 hover:text-white'
@@ -125,12 +125,12 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
               >
                 {isAdminPage ? (
                   <>
-                    <MapIcon className="w-3.5 h-3.5 text-blue-200" />
+                    <MapIcon className="w-3.5 h-3.5 text-blue-200 shrink-0" />
                     <span className="hidden sm:inline">View Blueprint</span>
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span className="hidden sm:inline">Admin Studio</span>
                   </>
                 )}
@@ -139,21 +139,21 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
           ) : (
             <button
               onClick={openAdminLogin}
-              className="flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 font-semibold text-xs rounded-xl transition active:scale-95"
+              className="flex items-center space-x-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:border-amber-500/50 font-semibold text-xs rounded-xl transition active:scale-95"
               title="Admin Login (Password only)"
             >
-              <Shield className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden xs:inline">Admin</span>
+              <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span className="hidden sm:inline">Admin</span>
             </button>
           )}
 
           {/* User Auth Dropdown & Direct Logout */}
           {user ? (
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center space-x-1 sm:space-x-1.5">
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 p-1.5 pl-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition text-xs text-slate-200"
+                  className="flex items-center space-x-1.5 sm:space-x-2 p-1 sm:p-1.5 pl-1.5 sm:pl-2.5 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition text-xs text-slate-200"
                 >
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center font-bold text-[10px] ${
@@ -166,13 +166,13 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
                     {user.displayName || user.email}
                   </span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.2 font-mono uppercase rounded font-bold ${
+                    className={`text-[9.5px] sm:text-[10px] px-1 sm:px-1.5 py-0.2 font-mono uppercase rounded font-bold ${
                       isAdmin ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'
                     }`}
                   >
                     {user.role}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:inline" />
                 </button>
 
                 {showUserMenu && (

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { RoomItem, CoreItem, EntityItem, SpaceType } from '../types';
 import { CORES_DATA } from '../data/floor6Data';
-import { SECTIONS_CONFIG, layoutRoomsInSection } from '../data/sectionsData';
+import { SECTIONS_CONFIG, layoutRoomsInSection, getFloorPrefix } from '../data/sectionsData';
 import {
   FLOORS_META,
   FloorMeta,
@@ -24,7 +24,7 @@ interface RoomsContextType {
   addRoom: (room: Omit<RoomItem, 'id'> & { id?: string }, targetFloor?: number) => RoomItem;
   addRoomToSection: (
     sectionKey: string,
-    roomData: { name: string; type: SpaceType; capacity: number; desc?: string },
+    roomData: { id?: string; name: string; type: SpaceType; capacity: number; desc?: string },
     targetFloor?: number
   ) => RoomItem;
   removeRoomFromSection: (roomId: string, targetFloor?: number) => void;
@@ -37,7 +37,8 @@ interface RoomsContextType {
 
 const RoomsContext = createContext<RoomsContextType | null>(null);
 
-const STORAGE_KEY = 'secmap_all_floors_v1';
+const STORAGE_KEY = 'secmap_all_floors_v2';
+const LEGACY_STORAGE_KEY = 'secmap_all_floors_v1';
 
 export function RoomsProvider({ children }: { children: React.ReactNode }) {
   const [currentFloor, setCurrentFloor] = useState<number>(6);
@@ -45,17 +46,29 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
     getInitialBuildingFloors
   );
 
-  // Load persisted custom rooms from localStorage on mount
+  // Load persisted custom rooms from localStorage on mount and sanitize floor isolation
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
-          setAllFloorsRooms((prev) => ({
-            ...prev,
-            ...parsed,
-          }));
+          const sanitized: Record<number, RoomItem[]> = {};
+          [1, 2, 3, 4, 5, 6].forEach((fl) => {
+            if (Array.isArray(parsed[fl])) {
+              // Ensure all rooms strictly belong to floor `fl` and have correct floor property
+              sanitized[fl] = parsed[fl].map((r: RoomItem) => ({
+                ...r,
+                floor: fl,
+              }));
+            }
+          });
+          if (Object.keys(sanitized).length > 0) {
+            setAllFloorsRooms((prev) => ({
+              ...prev,
+              ...sanitized,
+            }));
+          }
         }
       }
     } catch (e) {
@@ -86,18 +99,19 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
   // Generate deterministic [F][R][C][N] code for a given floor and (Row, Col)
   const generateNextRoomCode = (row: number, col: number, floorOverride?: number) => {
     const floor = floorOverride || currentFloor;
+    const prefix = getFloorPrefix(floor);
     const floorRooms = getRoomsForFloor(floor);
     const sameCellRooms = floorRooms.filter((r) => r.row === row && r.col === col);
     const maxBay = sameCellRooms.reduce((max, r) => Math.max(max, r.bay || 1), 0);
     const nextBay = maxBay + 1;
-    const roomNumber = `${floor}${row}${col}${nextBay}`;
+    const roomNumber = `${prefix}${row}${col}${nextBay}`;
     return { roomNumber, bay: nextBay };
   };
 
   // Add room directly into a specific section on any floor with auto-balancing
   const addRoomToSection = (
     sectionKey: string,
-    roomData: { name: string; type: SpaceType; capacity: number; desc?: string },
+    roomData: { id?: string; name: string; type: SpaceType; capacity: number; desc?: string },
     targetFloorOverride?: number
   ): RoomItem => {
     const floor = targetFloorOverride || currentFloor;
@@ -114,6 +128,7 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
           y: 645,
           w: 60,
           h: 60,
+          floor,
         },
         floor
       );
@@ -126,6 +141,7 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
     const combinedList = [
       ...existingSectionRooms,
       {
+        id: roomData.id,
         name: roomData.name,
         type: roomData.type,
         capacity: roomData.capacity,
@@ -133,12 +149,7 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
       },
     ];
 
-    const rebalanced = layoutRoomsInSection(sectionConfig, combinedList).map((r) => ({
-      ...r,
-      floor,
-      id: `${floor}${r.row || row}${r.col || col}${r.bay || 1}`,
-    }));
-
+    const rebalanced = layoutRoomsInSection(sectionConfig, combinedList, floor);
     const newRoom = rebalanced[rebalanced.length - 1];
     const updatedFloorRooms = [...otherRooms, ...rebalanced];
 
@@ -150,46 +161,49 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
     return newRoom;
   };
 
-  // Remove room from section and auto-redistribute remaining rooms
+  // Remove room from section and auto-redistribute remaining rooms on that specific floor
   const removeRoomFromSection = (roomId: string, targetFloorOverride?: number) => {
-    let floor = targetFloorOverride || currentFloor;
-    let targetRoom: RoomItem | undefined;
+    const floor = targetFloorOverride || currentFloor;
+    const floorRooms = getRoomsForFloor(floor);
+    let targetRoom = floorRooms.find((r) => r.id === roomId);
+    let effectiveFloor = floor;
 
-    for (const [flStr, rList] of Object.entries(allFloorsRooms)) {
-      const found = rList.find((r) => r.id === roomId);
-      if (found) {
-        floor = Number(flStr);
-        targetRoom = found;
-        break;
+    // Fallback: only search other floors if not found on current/specified floor
+    if (!targetRoom) {
+      for (const [flStr, rList] of Object.entries(allFloorsRooms)) {
+        const found = rList.find((r) => r.id === roomId);
+        if (found) {
+          effectiveFloor = Number(flStr);
+          targetRoom = found;
+          break;
+        }
       }
     }
 
     if (!targetRoom) return;
 
-    const floorRooms = getRoomsForFloor(floor);
+    const currentRoomsOnEffectiveFloor = getRoomsForFloor(effectiveFloor);
     const sectionKey = `${targetRoom.row}${targetRoom.col}`;
     const sectionConfig = SECTIONS_CONFIG[sectionKey];
 
     if (!sectionConfig) {
-      const updatedFloorRooms = floorRooms.filter((r) => r.id !== roomId);
-      saveAllFloors({ ...allFloorsRooms, [floor]: updatedFloorRooms });
+      const updatedFloorRooms = currentRoomsOnEffectiveFloor.filter((r) => r.id !== roomId);
+      saveAllFloors({ ...allFloorsRooms, [effectiveFloor]: updatedFloorRooms });
       return;
     }
 
-    const otherRooms = floorRooms.filter((r) => !(r.row === targetRoom!.row && r.col === targetRoom!.col));
-    const remainingSectionRooms = floorRooms.filter(
+    const otherRooms = currentRoomsOnEffectiveFloor.filter(
+      (r) => !(r.row === targetRoom!.row && r.col === targetRoom!.col)
+    );
+    const remainingSectionRooms = currentRoomsOnEffectiveFloor.filter(
       (r) => r.row === targetRoom!.row && r.col === targetRoom!.col && r.id !== roomId
     );
 
-    const rebalanced = layoutRoomsInSection(sectionConfig, remainingSectionRooms).map((r) => ({
-      ...r,
-      floor,
-      id: `${floor}${r.row || targetRoom!.row}${r.col || targetRoom!.col}${r.bay || 1}`,
-    }));
+    const rebalanced = layoutRoomsInSection(sectionConfig, remainingSectionRooms, effectiveFloor);
 
     saveAllFloors({
       ...allFloorsRooms,
-      [floor]: [...otherRooms, ...rebalanced],
+      [effectiveFloor]: [...otherRooms, ...rebalanced],
     });
   };
 
@@ -226,20 +240,27 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateRoom = (id: string, updates: Partial<RoomItem>, targetFloorOverride?: number) => {
-    let floor = targetFloorOverride || currentFloor;
-    for (const [flStr, rList] of Object.entries(allFloorsRooms)) {
-      if (rList.some((r) => r.id === id)) {
-        floor = Number(flStr);
-        break;
+    const floor = targetFloorOverride || currentFloor;
+    const floorRooms = getRoomsForFloor(floor);
+    let effectiveFloor = floor;
+
+    if (!floorRooms.some((r) => r.id === id)) {
+      for (const [flStr, rList] of Object.entries(allFloorsRooms)) {
+        if (rList.some((r) => r.id === id)) {
+          effectiveFloor = Number(flStr);
+          break;
+        }
       }
     }
 
-    const floorRooms = getRoomsForFloor(floor);
-    const updated = floorRooms.map((r) => (r.id === id ? { ...r, ...updates } : r));
+    const effectiveRooms = getRoomsForFloor(effectiveFloor);
+    const updated = effectiveRooms.map((r) =>
+      r.id === id ? { ...r, ...updates, floor: effectiveFloor } : r
+    );
 
     saveAllFloors({
       ...allFloorsRooms,
-      [floor]: updated,
+      [effectiveFloor]: updated,
     });
   };
 

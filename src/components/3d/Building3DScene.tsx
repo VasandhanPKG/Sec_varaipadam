@@ -1316,7 +1316,7 @@ export function Building3DScene({
   return (
     <div className="flex-1 w-full h-full relative spaceplanner-grid-bg overflow-hidden flex">
       {/* Top HUD: 3D Floor Isolator & Camera View Angle Presets */}
-      <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20 flex items-center gap-1.5 bg-[#fcfaf6]/95 backdrop-blur-md rounded-2xl p-1 sm:p-1.5 border border-[#ded4c0] shadow-md shadow-[#11202f]/10 max-w-[calc(100vw-5.5rem)] sm:max-w-none overflow-x-auto no-scrollbar">
+      <div className="absolute top-2 sm:top-3.5 left-28 sm:left-32 z-20 flex items-center gap-1.5 bg-[#fcfaf6]/95 backdrop-blur-md rounded-2xl p-1 sm:p-1.5 border border-[#ded4c0] shadow-md shadow-[#11202f]/10 max-w-[calc(100vw-18rem)] overflow-x-auto no-scrollbar">
         <button
           onClick={() => handleFloorSelect(null)}
           className={`px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-semibold whitespace-nowrap transition ${

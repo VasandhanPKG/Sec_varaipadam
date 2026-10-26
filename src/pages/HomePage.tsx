@@ -134,45 +134,54 @@ export function HomePage() {
         </div>
 
         {/* MULTI-FLOOR TRANSITION BANNER (TOP CENTER) */}
-        {activeRoute && activeRoute.isMultiFloor && (
-          <div className="absolute top-2.5 sm:top-3.5 left-1/2 transform -translate-x-1/2 z-30 max-w-[92vw] overflow-x-auto no-scrollbar">
-            <div className="flex items-center gap-1.5 sm:gap-2.5 bg-slate-900/95 backdrop-blur-md border border-amber-500/40 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-2xl shadow-black/60 text-xs whitespace-nowrap">
-              <button
-                onClick={() => setCurrentFloor(activeRoute.startFloor)}
-                className={`px-2.5 py-1 rounded-xl font-mono text-[11px] sm:text-xs font-bold transition flex items-center gap-1 ${
-                  currentFloor === activeRoute.startFloor
-                    ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/30'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-                title="View Starting Floor"
-              >
-                <span>Floor {activeRoute.startFloor}</span>
-                <span className="opacity-80">({activeRoute.startEntity.name || activeRoute.startEntity.id})</span>
-              </button>
+        {activeRoute && activeRoute.isMultiFloor && (() => {
+          const transitionStep = activeRoute.steps?.find((s) => s.isFloorChange);
+          const coreLabel = transitionStep?.title?.replace(/^Take\s+/i, '') || 'Southwest Lift';
 
-              <span className="text-amber-400 font-bold font-mono">➔</span>
+          return (
+            <div className="absolute top-2.5 sm:top-3.5 left-1/2 transform -translate-x-1/2 z-30 max-w-[calc(100vw-130px)] sm:max-w-2xl overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 bg-slate-900/95 backdrop-blur-md border border-amber-500/40 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-2xl shadow-black/60 text-xs whitespace-nowrap">
+                <button
+                  onClick={() => setCurrentFloor(activeRoute.startFloor)}
+                  className={`px-2.5 py-1 rounded-xl font-mono text-[11px] sm:text-xs font-bold transition flex items-center gap-1 ${
+                    currentFloor === activeRoute.startFloor
+                      ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/30'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
+                  title="View Starting Floor"
+                >
+                  <span>Floor {activeRoute.startFloor}</span>
+                  <span className="opacity-80 max-w-[110px] truncate hidden sm:inline">
+                    ({activeRoute.startEntity.name || activeRoute.startEntity.id})
+                  </span>
+                </button>
 
-              <div className="px-2 py-0.5 bg-blue-600/30 border border-blue-500/40 text-blue-300 rounded-xl font-mono text-[10px] sm:text-[11px] font-bold flex items-center gap-1 shrink-0">
-                <span>🛗 Southwest Lift</span>
+                <span className="text-amber-400 font-bold font-mono">➔</span>
+
+                <div className="px-2 py-0.5 bg-blue-600/30 border border-blue-500/40 text-blue-300 rounded-xl font-mono text-[10px] sm:text-[11px] font-bold flex items-center gap-1 shrink-0">
+                  <span>🛗 {coreLabel}</span>
+                </div>
+
+                <span className="text-amber-400 font-bold font-mono">➔</span>
+
+                <button
+                  onClick={() => setCurrentFloor(activeRoute.targetFloor)}
+                  className={`px-2.5 py-1 rounded-xl font-mono text-[11px] sm:text-xs font-bold transition flex items-center gap-1 ${
+                    currentFloor === activeRoute.targetFloor
+                      ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/30'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
+                  title="View Destination Floor"
+                >
+                  <span>Floor {activeRoute.targetFloor}</span>
+                  <span className="opacity-80 max-w-[110px] truncate hidden sm:inline">
+                    ({activeRoute.targetEntity.name || activeRoute.targetEntity.id})
+                  </span>
+                </button>
               </div>
-
-              <span className="text-amber-400 font-bold font-mono">➔</span>
-
-              <button
-                onClick={() => setCurrentFloor(activeRoute.targetFloor)}
-                className={`px-2.5 py-1 rounded-xl font-mono text-[11px] sm:text-xs font-bold transition flex items-center gap-1 ${
-                  currentFloor === activeRoute.targetFloor
-                    ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-500/30'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                }`}
-                title="View Destination Floor"
-              >
-                <span>Floor {activeRoute.targetFloor}</span>
-                <span className="opacity-80">({activeRoute.targetEntity.name || activeRoute.targetEntity.id})</span>
-              </button>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* SINGLE FLOOR ROUTE BANNER (TOP CENTER) */}
         {activeRoute && !activeRoute.isMultiFloor && (

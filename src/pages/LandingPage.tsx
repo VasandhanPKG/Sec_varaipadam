@@ -19,10 +19,14 @@ export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail, loginStudent, logout, isAdmin } = useAuth();
 
-  // If already logged in, do not show login page - redirect straight to Route selection
+  // If already logged in, redirect straight to target page
   React.useEffect(() => {
     if (user) {
-      navigate('/route', { replace: true });
+      if (user.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/route', { replace: true });
+      }
     }
   }, [user, navigate]);
 
@@ -40,6 +44,7 @@ export const LandingPage: React.FC = () => {
   if (user) {
     return null;
   }
+
 
   // Handle Sign In / Create Account
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -299,15 +304,23 @@ export const LandingPage: React.FC = () => {
             <span>Continue with Google</span>
           </button>
 
-          {/* Quick Continue */}
-          <div className="mt-4 pt-3 border-t border-[#ded4c0] text-center">
+          {/* Quick Continue & Admin Access */}
+          <div className="mt-4 pt-3 border-t border-[#ded4c0] flex items-center justify-between text-xs">
             <button
               type="button"
               onClick={handleStudentContinue}
-              className="text-xs text-[#1e354d] hover:text-blue-700 font-bold inline-flex items-center gap-1 transition"
+              className="text-[#1e354d] hover:text-blue-700 font-bold inline-flex items-center gap-1 transition"
             >
               <span>Quick Student Entry</span>
               <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAdminModalOpen(true)}
+              className="text-amber-800 hover:text-amber-900 font-bold inline-flex items-center gap-1 transition px-2.5 py-1 bg-amber-100/70 hover:bg-amber-100 rounded-lg border border-amber-300"
+            >
+              <Shield className="w-3.5 h-3.5 text-amber-700" />
+              <span>Admin Studio</span>
             </button>
           </div>
         </div>

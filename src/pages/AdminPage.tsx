@@ -6,6 +6,7 @@ import { RoomItem, SpaceType, EntityItem } from '../types';
 import {
   SECTIONS_CONFIG,
   ALL_SECTIONS_LIST,
+  getFloorPrefix,
 } from '../data/sectionsData';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -58,6 +59,7 @@ export function AdminPage() {
   // Add Room Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [addSectionKey, setAddSectionKey] = useState<string>('65');
+  const [addRoomCode, setAddRoomCode] = useState('');
   const [addName, setAddName] = useState('');
   const [addType, setAddType] = useState<SpaceType>('classroom');
   const [addCapacity, setAddCapacity] = useState(40);
@@ -161,6 +163,7 @@ export function AdminPage() {
     const created = addRoomToSection(
       addSectionKey,
       {
+        id: addRoomCode.trim() ? addRoomCode.trim() : undefined,
         name: addName.trim(),
         type: addType,
         capacity: Number(addCapacity) || 40,
@@ -172,6 +175,7 @@ export function AdminPage() {
     setIsAddModalOpen(false);
     setSelectedRoomId(created.id);
     setAddName('');
+    setAddRoomCode('');
     setAddDesc('');
     showToast(`🎉 Room ${created.id} (${created.name}) created on Floor ${currentFloor}!`);
   };
@@ -755,7 +759,7 @@ export function AdminPage() {
                     Add New Space to Floor {currentFloor}
                   </h3>
                   <p className="text-[11px] text-slate-500">
-                    Auto-assigns coordinates and balances wing layout
+                    Floor {currentFloor} • {currentFloorMeta?.department} (Isolated Floor Space)
                   </p>
                 </div>
               </div>
@@ -768,18 +772,51 @@ export function AdminPage() {
             </div>
 
             <form onSubmit={handleAddNewRoom} className="p-6 space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Space / Classroom Name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={addName}
-                  onChange={(e) => setAddName(e.target.value)}
-                  placeholder="e.g. Collaborative Design Studio 605"
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
-                />
+              {/* Floor Context Info Banner */}
+              <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-2xl flex items-center justify-between text-xs text-blue-900">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold uppercase tracking-wider text-[10px] px-2 py-0.5 bg-blue-600 text-white rounded-md">
+                    Level 0{currentFloor}
+                  </span>
+                  <span className="font-semibold">{currentFloorMeta?.name} ({currentFloorMeta?.department})</span>
+                </div>
+                <span className="font-mono text-[10.5px] text-blue-700 font-bold">
+                  Prefix: '{getFloorPrefix(currentFloor)}'
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Space / Classroom Name <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={addName}
+                    onChange={(e) => setAddName(e.target.value)}
+                    placeholder="e.g. CAD Lab 2 or MBA 605"
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl px-3.5 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-slate-700">
+                      Room Code (Optional)
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      Auto: {getFloorPrefix(currentFloor)}{addSectionKey}x
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={addRoomCode}
+                    onChange={(e) => setAddRoomCode(e.target.value)}
+                    placeholder={`e.g. ${getFloorPrefix(currentFloor)}${addSectionKey}1`}
+                    className="w-full bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl px-3.5 py-2 text-xs font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-100 transition"
+                  />
+                </div>
               </div>
 
               <div>

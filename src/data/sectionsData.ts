@@ -47,14 +47,35 @@ export const SECTIONS_CONFIG: Record<string, SectionConfig> = {
 
 export const ALL_SECTIONS_LIST = Object.values(SECTIONS_CONFIG);
 
+export function getFloorPrefix(floor: number): string {
+  switch (floor) {
+    case 1:
+      return '0';
+    case 2:
+      return '1';
+    case 3:
+      return '2';
+    case 4:
+      return '4';
+    case 5:
+      return '5';
+    case 6:
+      return '6';
+    default:
+      return String(floor);
+  }
+}
+
 export function layoutRoomsInSection(
   section: SectionConfig,
-  roomDefinitions: { name: string; type?: SpaceType; capacity?: number; desc?: string }[]
+  roomDefinitions: { id?: string; name: string; type?: SpaceType; capacity?: number; desc?: string }[],
+  floor: number = 6
 ): RoomItem[] {
   const count = Math.max(1, roomDefinitions.length);
   const totalSpan = section.endX - section.startX;
   const totalGap = (count - 1) * section.gap;
   const roomWidth = Math.max(38, Math.floor((totalSpan - totalGap) / count));
+  const prefix = getFloorPrefix(floor);
 
   return roomDefinitions.map((def, idx) => {
     const bayIndex = idx + 1;
@@ -71,7 +92,10 @@ export function layoutRoomsInSection(
       doorY = y + h + 10;
     }
 
-    const roomId = `6${section.row}${section.col}${bayIndex}`;
+    // Preserve custom ID if provided and appropriately prefixed, else generate deterministic canonical code [F][R][C][B]
+    const roomId = def.id && (def.id.startsWith(prefix) || !/^\d{4}$/.test(def.id))
+      ? def.id
+      : `${prefix}${section.row}${section.col}${bayIndex}`;
 
     return {
       id: roomId,
@@ -82,13 +106,15 @@ export function layoutRoomsInSection(
       row: section.row,
       col: section.col,
       bay: bayIndex,
+      floor,
       x,
       y,
       w,
       h,
       doorX,
       doorY,
-      desc: def.desc || `${def.name} in Section ${section.row}${section.col}.`,
+      desc: def.desc || `${def.name} in Section ${section.row}${section.col} (Floor ${floor}).`,
     };
   });
 }
+

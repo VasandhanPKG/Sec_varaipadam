@@ -26,6 +26,7 @@ import {
 } from '../../types';
 import { useRooms } from '../../context/RoomsContext';
 import { resolveRoomFloor } from '../../lib/pathfinding';
+import { FLOORS_META } from '../../data/buildingFloorsData';
 
 interface BlueprintCanvasProps {
   activeRoute: RouteResult | null;
@@ -469,35 +470,6 @@ export function BlueprintCanvas({
         onMouseMove={handleMouseMove}
         className="flex-1 min-h-0 w-full relative overflow-hidden flex items-center justify-center p-2 sm:p-4 pb-24 sm:pb-28"
       >
-        {/* Floating Multi-Floor Quick-Switch Bar on Canvas */}
-        {activeRoute && activeRoute.isMultiFloor && (
-          <div className="absolute top-3 sm:top-5 left-1/2 -translate-x-1/2 z-20 bg-[#fcfaf6]/95 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl shadow-xl shadow-[#11202f]/10 border border-[#ded4c0] flex items-center gap-2 text-xs animate-fadeIn max-w-[95vw] overflow-x-auto">
-            <span className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider hidden md:inline">
-              Multi-Floor Path:
-            </span>
-            <button
-              onClick={() => setCurrentFloor(activeRoute.startFloor)}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
-                currentFloor === activeRoute.startFloor
-                  ? 'bg-[#1e354d] text-white shadow-sm scale-105'
-                  : 'bg-white text-[#1e354d] border border-[#ded4c0] hover:bg-[#ede5d6]'
-              }`}
-            >
-              <span>1. Floor {activeRoute.startFloor} ➔ Lift/Stairs</span>
-            </button>
-            <span className="text-[#8a99a8] font-bold">➔</span>
-            <button
-              onClick={() => setCurrentFloor(activeRoute.targetFloor)}
-              className={`px-3 py-1 rounded-xl text-xs font-bold transition flex items-center gap-1.5 whitespace-nowrap ${
-                currentFloor === activeRoute.targetFloor
-                  ? 'bg-[#1e354d] text-white shadow-sm scale-105'
-                  : 'bg-white text-[#1e354d] border border-[#ded4c0] hover:bg-[#ede5d6]'
-              }`}
-            >
-              <span>2. Lift/Stairs ➔ Floor {activeRoute.targetFloor}</span>
-            </button>
-          </div>
-        )}
 
         <svg
           ref={svgRef}
@@ -649,16 +621,9 @@ export function BlueprintCanvas({
                 }
 
                 const getHodDeptName = (fl: number) => {
-                  switch (fl) {
-                    case 1: return 'Sci & Humanities';
-                    case 2: return 'ECE';
-                    case 3: return 'Mech & Robotics';
-                    case 4: return 'EEE';
-                    case 5: return 'CSE';
-                    case 6: return 'AI & Data Sci';
-                    default: return 'Engineering';
-                  }
+                  return FLOORS_META[fl]?.department || 'Department Office';
                 };
+
 
                 return (
                   <g

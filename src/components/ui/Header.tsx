@@ -104,26 +104,38 @@ export const Header: React.FC<HeaderProps> = ({ viewMode, onViewModeChange }) =>
         <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
           {/* Admin Studio Link if already logged in as Admin */}
           {isAdmin ? (
-            <Link
-              to={isAdminPage ? '/map' : '/admin'}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition shadow-sm ${
-                isAdminPage
-                  ? 'bg-blue-600 text-white border-blue-500 shadow-blue-600/20'
-                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25 hover:text-white'
-              }`}
-            >
-              {isAdminPage ? (
-                <>
-                  <MapIcon className="w-3.5 h-3.5 text-blue-200" />
-                  <span className="hidden sm:inline">View Blueprint</span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="hidden sm:inline">Admin Studio</span>
-                </>
+            <div className="flex items-center space-x-1.5">
+              {isAdminPage && (
+                <Link
+                  to="/route"
+                  className="flex items-center space-x-1 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+                  title="Return to Route Planner"
+                >
+                  <Compass className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="hidden sm:inline">Planner</span>
+                </Link>
               )}
-            </Link>
+              <Link
+                to={isAdminPage ? '/map' : '/admin'}
+                className={`flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition shadow-sm ${
+                  isAdminPage
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-500 shadow-blue-600/20'
+                    : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25 hover:text-white'
+                }`}
+              >
+                {isAdminPage ? (
+                  <>
+                    <MapIcon className="w-3.5 h-3.5 text-blue-200" />
+                    <span className="hidden sm:inline">View Blueprint</span>
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="hidden sm:inline">Admin Studio</span>
+                  </>
+                )}
+              </Link>
+            </div>
           ) : (
             <button
               onClick={openAdminLogin}

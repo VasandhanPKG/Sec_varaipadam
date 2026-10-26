@@ -126,14 +126,25 @@ export const RouteSelectionPage: React.FC = () => {
             </Link>
           )}
 
-          <button
-            onClick={() => setIsAdminModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-[#1e354d] hover:bg-[#162a3f] text-white shadow-sm transition active:scale-95"
-            title="Administrator Login (Password only)"
-          >
-            <Shield className="w-3.5 h-3.5 fill-white text-[#1e354d]" />
-            <span className="hidden xs:inline">Admin Login</span>
-          </button>
+          {isAdmin ? (
+            <Link
+              to="/admin"
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-700 text-white shadow-md shadow-amber-600/20 transition active:scale-95"
+              title="Open Campus Administrator Studio"
+            >
+              <Shield className="w-3.5 h-3.5 fill-white text-amber-600" />
+              <span>Admin Studio</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => setIsAdminModalOpen(true)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-[#1e354d] hover:bg-[#162a3f] text-white shadow-sm transition active:scale-95"
+              title="Administrator Login (Password required)"
+            >
+              <Shield className="w-3.5 h-3.5 fill-white text-[#1e354d]" />
+              <span className="hidden xs:inline">Admin</span>
+            </button>
+          )}
         </div>
       </header>
 
@@ -251,6 +262,31 @@ export const RouteSelectionPage: React.FC = () => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+
+          {/* Quick Admin Access Footer */}
+          <div className="pt-3 border-t border-[#ded4c0] flex items-center justify-between text-xs text-[#64748b]">
+            <span>Manage campus spaces?</span>
+            {isAdmin ? (
+              <Link
+                to="/admin"
+                className="font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1 hover:underline"
+              >
+                <Shield className="w-3.5 h-3.5 text-amber-600" />
+                <span>Admin Studio</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsAdminModalOpen(true)}
+                className="font-bold text-[#1e354d] hover:text-blue-700 flex items-center gap-1 hover:underline"
+              >
+                <Shield className="w-3.5 h-3.5 text-[#1e354d]" />
+                <span>Admin Login</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </main>
 
